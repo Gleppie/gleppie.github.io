@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glep's SandBox</title>
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230070f3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='16 18 22 12 16 6'></polyline><polyline points='8 6 2 12 8 18'></polyline><line x1='14' y1='4' x2='10' y2='20'></line></svg>">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="disclaimer-modal" class="modal-overlay">
+    <div class="disclaimer-content">
+        <div class="disclaimer-header">
+            <svg class="emblem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <h2>Disclaimer</h2>
+        </div>
+        <p>Everything on this page is created strictly for <strong>testing and experimental purposes</strong>.</p>
+        <p>By proceeding, you acknowledge that I am <strong>not responsible</strong> for how you choose to use any of these tools or code snippets. Use at your own discretion.</p>
+        <button class="filter-btn active" onclick="acceptDisclaimer()" style="width: 100%; margin-top: 20px; padding: 12px;">I Understand</button>
+    </div>
+</div>
+
+<div class="container">
+    <header>
+        <div class="header-title-area">
+            <svg class="emblem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 18 22 12 16 6"></polyline>
+                <polyline points="8 6 2 12 8 18"></polyline>
+                <line x1="14" y1="4" x2="10" y2="20"></line>
+            </svg>
+            <h1>Glep's SandBox</h1>
+        </div>
+        <p class="subtitle">Experimental projects & web tools.</p>
+        
+        <div class="nav-wrapper">
+            <div class="dropdown">
+                <button class="filter-btn dropdown-trigger" onclick="toggleDropdown(event)" aria-haspopup="true" aria-expanded="false">
+                    Quick Tools Menu ▾
+                </button>
+                <div id="toolsDropdown" class="dropdown-content">
+                    <a href="qrcode.html">QR Code Generator</a>
+                    <a href="lastwarp1.html">Last War PS1 Map</a>
+                    <a href="pokecal.html">PokemonGo Distance Calc</a>
+                    <a href="discordmessages.html">Discord Custom Messages</a>
+                    <a href="epu.html">EPU Generator</a>
+                </div>
+            </div>
+
+            <nav class="filter-nav">
+<!--           <button class="filter-btn active" onclick="filterProjects('all', this)">All</button> 
+                <button class="filter-btn" onclick="filterProjects('discord', this)">Discord</button> -->
+            </nav>
+        </div>
+    </header>
+
+    <main id="project-list">
+        <article class="project-entry" data-area="discord">
+            <div class="project-header">
+                <h3 class="project-title">Discord IP Logger</h3>
+                <span class="area-tag">Discord</span>
+            </div>
+            <p class="description">Simple utility using webhooks to log and visualize visitor metadata.</p>
+            <span class="view-source-btn" onclick="openSource('discord')">View Source & Notes →</span>
+        </article>
+    </main>
+</div>
+
+<div id="source-modal" onclick="closeSource(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="close-btn" onclick="closeSource()" aria-label="Close modal">&times;</button>
+        <h2 id="modal-title" style="margin-top:0;">Source Code</h2>
+        <div id="modal-notes" class="modal-notes"></div>
+        <pre id="modal-code"></pre>
+    </div>
+</div>
+
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-column">
+                <span class="label-text">Connect</span>
+                <div class="social-links">
+                    <a href="https://github.com/gleppie" target="_blank">GitHub</a>
+                    <a href="" target="_blank">Discord: gleppie</a>
+                </div>
+            </div>
+
+            <div class="footer-column">
+                <span class="label-text">Contact Me</span>
+                <div class="contact-mini-form">
+                    <input type="text" id="footerContact" placeholder="Discord User or Email">
+                    <textarea id="footerMsg" placeholder="Brief message..." rows="3"></textarea>
+                    
+                    <div class="pattern-captcha">
+                        <div id="captchaPrompt" class="label-text" style="text-transform:none; margin-bottom:10px; font-size: 0.65rem;">
+                            Verify: Click the <strong id="targetIconName" style="color: var(--accent);">...</strong>
+                        </div>
+                        <div id="iconGrid" class="icon-grid"></div>
+                        <input type="hidden" id="captchaVerified" value="false">
+                    </div>
+
+                    <button class="filter-btn active" onclick="sendFooterContact()" id="footerBtn" style="width: 100%; border-radius: 8px; margin-top: 12px;" disabled>Verify to Send</button>
+                </div>
+            </div>
+        </div>
+        <p class="copyright">© 2026 Glep's SandBox — For Testing Only</p>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
