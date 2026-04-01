@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook Custom Messages | Glep's SandBox</title>
+    <style>
+        :root {
+            --bg-color: #fafafa;
+            --text-main: #111111;
+            --text-dim: #666666;
+            --accent: #0070f3;
+            --border: #eaeaea;
+            --card-hover: #f0f0f0;
+            --input-bg: #ffffff;
+            --error: #ff4d4d;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0a0a0a;
+                --text-main: #ededed;
+                --text-dim: #a0a0a0;
+                --accent: #3291ff;
+                --border: #222222;
+                --card-hover: #161616;
+                --input-bg: #111111;
+            }
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            padding: 40px 20px;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .container { 
+            max-width: 680px; 
+            margin: auto; 
+            background: var(--bg-color); 
+            padding: 40px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+        }
+
+        h1 { font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; text-align: center; }
+        p.subtitle { color: var(--text-dim); text-align: center; margin-bottom: 40px; font-size: 0.95rem; }
+
+        label { 
+            display: block; 
+            margin: 20px 0 8px; 
+            text-transform: uppercase; 
+            font-size: 0.7rem; 
+            font-weight: 700; 
+            letter-spacing: 1px;
+            color: var(--text-dim);
+        }
+
+        input[type="text"], 
+        input[type="url"], 
+        textarea, 
+        select { 
+            width: 100%; 
+            padding: 12px 16px; 
+            border-radius: 8px; 
+            border: 1px solid var(--border); 
+            background: var(--input-bg); 
+            color: var(--text-main); 
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.1);
+        }
+
+        .row { display: flex; gap: 16px; }
+        .row > div { flex: 1; }
+
+        .color-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card-hover);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        input[type="color"] {
+            border: none;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            background: none;
+        }
+
+        .hidden { display: none; }
+
+        .btn { 
+            background: var(--accent); 
+            color: white; 
+            border: none; 
+            padding: 14px; 
+            width: 100%; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 1rem;
+            margin-top: 32px;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover { opacity: 0.9; }
+        .btn:active { transform: translateY(1px); }
+
+        .section-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 32px 0;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: var(--text-main);
+            margin: 0 !important;
+            text-transform: none !important;
+            font-weight: 500 !important;
+        }
+
+        .checkbox-container input { margin-right: 8px; cursor: pointer; }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--text-main); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" class="back-link">← Back</a>
+    <h1>Webhook Custom Messages</h1>
+    <p class="subtitle">Send rich notifications to Discord channels via API</p>
+    
+    <label>Webhook URL</label>
+    <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/...">
+
+    <div class="row">
+        <div>
+            <label>Message Type</label>
+            <select id="msgType" onchange="toggleMode()">
+                <option value="text">Plain Text</option>
+                <option value="embed">Rich Embed</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="textSection">
+        <label>Message Content</label>
+        <textarea id="content" rows="4" placeholder="What's on your mind?"></textarea>
+    </div>
+
+    <div id="embedSection" class="hidden">
+        <div class="section-divider"></div>
+        
+        <div class="row">
+            <div>
+                <label>Embed Title</label>
+                <input type="text" id="eTitle" placeholder="The Big Heading">
+            </div>
+            <div>
+                <label>Theme Color</label>
+                <div class="color-controls">
+                    <input type="color" id="eColor" value="#0070f3">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="randomColor"> Random
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <label>Description (Main Body)</label>
+        <textarea id="eDesc" rows="4" placeholder="Main content of the embed..."></textarea>
+        
+        <div class="row">
+            <div>
+                <label>Author Name</label>
+                <input type="text" id="eAuthor" placeholder="Sender display name">
+            </div>
+            <div>
+                <label>Author Icon URL</label>
+                <input type="url" id="eAuthorIcon" placeholder="https://...">
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                <label>Thumbnail (Top Right)</label>
+                <input type="url" id="eThumb" placeholder="https://...">
+            </div>
+            <div>
+                <label>Large Image (Bottom)</label>
+                <input type="url" id="eImage" placeholder="https://...">
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                <label>Footer Text</label>
+                <input type="text" id="eFooter" placeholder="Small bottom text">
+            </div>
+            <div>
+                <label>Footer Icon URL</label>
+                <input type="url" id="eFooterIcon" placeholder="https://...">
+            </div>
+        </div>
+    </div>
+
+    <button class="btn" onclick="sendMessage()">Send Message</button>
+</div>
+
+<script>
+    function toggleMode() {
+        const isEmbed = document.getElementById('msgType').value === 'embed';
+        document.getElementById('embedSection').classList.toggle('hidden', !isEmbed);
+        document.getElementById('textSection').classList.toggle('hidden', isEmbed);
+    }
+
+    function clean(obj) {
+        for (var propName in obj) {
+            if (obj[propName] === null || obj[propName] === undefined || obj[propName] === "") {
+                delete obj[propName];
+            }
+        }
+        return obj;
+    }
+
+    async function sendMessage() {
+        const url = document.getElementById('webhookUrl').value;
+        const type = document.getElementById('msgType').value;
+        const isRandom = document.getElementById('randomColor').checked;
+        
+        if (!url) return alert("⚠️ Please provide a Webhook URL.");
+
+        let payload = {};
+
+        if (type === 'text') {
+            payload.content = document.getElementById('content').value;
+            if (!payload.content) return alert("Message content cannot be empty.");
+        } else {
+            let colorDecimal;
+            if (isRandom) {
+                colorDecimal = Math.floor(Math.random() * 16777215);
+            } else {
+                const hex = document.getElementById('eColor').value.replace('#', '');
+                colorDecimal = parseInt(hex, 16);
+            }
+
+            const embed = {
+                title: document.getElementById('eTitle').value,
+                description: document.getElementById('eDesc').value,
+                color: colorDecimal,
+                author: clean({
+                    name: document.getElementById('eAuthor').value,
+                    icon_url: document.getElementById('eAuthorIcon').value
+                }),
+                thumbnail: clean({ url: document.getElementById('eThumb').value }),
+                image: clean({ url: document.getElementById('eImage').value }),
+                footer: clean({
+                    text: document.getElementById('eFooter').value,
+                    icon_url: document.getElementById('eFooterIcon').value
+                })
+            };
+
+            if (!embed.title && !embed.description) return alert("Embeds need a Title or Description.");
+            payload.embeds = [clean(embed)];
+        }
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) alert("Sent");
+            else {
+                const errorData = await response.json();
+                alert("Discord Error: " + (errorData.message || "Invalid payload"));
+            }
+        } catch (err) {
+            alert("Connection Failed: " + err.message);
+        }
+    }
+</script>
+
+</body>
+</html>
