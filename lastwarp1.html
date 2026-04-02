@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Last War Survival Map | Glep's Bean Bag</title>
     
     <style>
@@ -39,7 +39,6 @@
             overflow: hidden;
         }
 
-        /* --- Compact Header for Desktop --- */
         header {
             background-color: var(--bg-color);
             padding: 6px 16px;
@@ -74,7 +73,6 @@
         input[type="color"] { width: 22px; height: 22px; border: 1px solid var(--border); border-radius: 4px; padding: 0; cursor: pointer; background: none; }
         input[type="range"] { accent-color: var(--accent); cursor: pointer; width: 50px; }
 
-        /* --- Main Layout --- */
         main {
             flex-grow: 1;
             position: relative;
@@ -114,10 +112,10 @@
 
         #joystick-base {
             position: fixed;
-            bottom: 30px;
+            bottom: 40px;
             left: 30px;
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             background: var(--panel-bg);
             backdrop-filter: blur(10px);
             border: 2px solid var(--border);
@@ -125,22 +123,23 @@
             z-index: 2000;
             display: none; 
             touch-action: none;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
         }
 
         #joystick-stick {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             background: var(--accent);
             border-radius: 50%;
             transform: translate(-50%, -50%);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
         .back-link { font-size: 0.8rem; color: var(--text-dim); text-decoration: none; }
 
-        /* --- Mobile Overrides (Keep it usable for thumbs) --- */
         @media (max-width: 768px) {
             header { flex-direction: column; height: auto; padding: 10px; gap: 10px; }
             .left-sect { width: 100%; justify-content: space-between; }
@@ -148,7 +147,12 @@
             .header-actions { width: 100%; border-top: 1px solid var(--border); padding-top: 8px; justify-content: space-between; }
             
             button { padding: 8px 12px; font-size: 0.75rem; }
-            main { justify-content: flex-start; align-items: flex-start; padding: 0; }
+            main { 
+                justify-content: flex-start; 
+                align-items: flex-start; 
+                padding: 0;
+                /* Allow container to scroll beyond image boundaries if needed */
+            }
             #joystick-base { display: block; }
         }
     </style>
@@ -233,6 +237,7 @@
         saveState();
     };
 
+    // --- ENHANCED JOYSTICK & PANNING LOGIC ---
     const jBase = document.getElementById('joystick-base');
     const jStick = document.getElementById('joystick-stick');
     let jActive = false;
@@ -246,17 +251,26 @@
         const centerY = rect.top + rect.height / 2;
         let dx = touch.clientX - centerX;
         let dy = touch.clientY - centerY;
-        const dist = Math.min(Math.sqrt(dx*dx + dy*dy), rect.width / 2);
+        const maxDist = rect.width / 2;
+        const dist = Math.min(Math.sqrt(dx*dx + dy*dy), maxDist);
         const angle = Math.atan2(dy, dx);
+        
         const moveX = Math.cos(angle) * dist;
         const moveY = Math.sin(angle) * dist;
         jStick.style.transform = `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px))`;
-        jInput.x = moveX / (rect.width / 2);
-        jInput.y = moveY / (rect.height / 2);
+        
+        // Speed scaling
+        jInput.x = (moveX / maxDist);
+        jInput.y = (moveY / maxDist);
     };
 
-    jBase.addEventListener('touchstart', (e) => { jActive = true; });
-    window.addEventListener('touchmove', (e) => { if(jActive) { e.preventDefault(); handleJoystick(e); } }, {passive: false});
+    jBase.addEventListener('touchstart', (e) => { jActive = true; e.stopPropagation(); });
+    window.addEventListener('touchmove', (e) => { 
+        if(jActive) { 
+            e.preventDefault(); 
+            handleJoystick(e); 
+        } 
+    }, {passive: false});
     window.addEventListener('touchend', () => { 
         jActive = false; jInput = { x: 0, y: 0 }; 
         jStick.style.transform = `translate(-50%, -50%)`;
@@ -264,13 +278,15 @@
 
     function updatePan() {
         if (jInput.x !== 0 || jInput.y !== 0) {
-            container.scrollLeft += jInput.x * 12;
-            container.scrollTop += jInput.y * 12;
+            // Speed factor 15 allows for fast travel across the 1100px width
+            container.scrollLeft += jInput.x * 15;
+            container.scrollTop += jInput.y * 15;
         }
         requestAnimationFrame(updatePan);
     }
     updatePan();
 
+    // --- DRAWING LOGIC ---
     function setMode(mode, btn) {
         currentMode = mode;
         document.querySelectorAll('.btn-tool').forEach(b => b.classList.remove('active'));
