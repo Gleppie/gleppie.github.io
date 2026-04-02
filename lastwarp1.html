@@ -67,27 +67,30 @@
         button.active { background: var(--accent); color: white; border-color: var(--accent); }
         #btn-save { background: var(--accent) !important; color: white !important; border: none !important; }
 
-        .tool-item { display: flex; align-items: center; gap: 6px; }
-        .control-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); }
-
-        input[type="color"] { width: 22px; height: 22px; border: 1px solid var(--border); border-radius: 4px; padding: 0; cursor: pointer; background: none; }
+        input[type="color"] { width: 22px; height: 22px; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; }
         input[type="range"] { accent-color: var(--accent); cursor: pointer; width: 50px; }
 
+        /* --- Map Viewport --- */
         main {
             flex-grow: 1;
             position: relative;
             background-color: var(--card-hover);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden; 
-            padding: 10px;
+            overflow: auto; /* Enable scrolling */
+            display: block; /* Important for padding to work */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* The Spacer provides the "Extra Room" to scroll past edges */
+        #scroll-spacer {
+            position: relative;
+            padding: 50vh 50vw; /* 50% of screen size padding on all sides */
+            display: inline-block;
         }
 
         #canvas-stack {
             position: relative;
             background: #000;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.3);
             border-radius: 4px;
         }
 
@@ -104,12 +107,12 @@
             border-radius: 20px;
             border: 1px solid var(--border);
             font-size: 0.65rem;
-            font-family: monospace;
             color: var(--accent);
             z-index: 10;
             pointer-events: none;
         }
 
+        /* --- Joystick --- */
         #joystick-base {
             position: fixed;
             bottom: 40px;
@@ -123,7 +126,7 @@
             z-index: 2000;
             display: none; 
             touch-action: none;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
         }
 
         #joystick-stick {
@@ -135,24 +138,12 @@
             background: var(--accent);
             border-radius: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-
-        .back-link { font-size: 0.8rem; color: var(--text-dim); text-decoration: none; }
 
         @media (max-width: 768px) {
             header { flex-direction: column; height: auto; padding: 10px; gap: 10px; }
-            .left-sect { width: 100%; justify-content: space-between; }
-            .tool-bar { width: 100%; justify-content: center; flex-wrap: wrap; }
-            .header-actions { width: 100%; border-top: 1px solid var(--border); padding-top: 8px; justify-content: space-between; }
-            
-            button { padding: 8px 12px; font-size: 0.75rem; }
-            main { 
-                justify-content: flex-start; 
-                align-items: flex-start; 
-                padding: 0;
-                /* Allow container to scroll beyond image boundaries if needed */
-            }
+            .left-sect, .tool-bar, .header-actions { width: 100%; justify-content: space-around; }
+            .header-actions { border-top: 1px solid var(--border); padding-top: 8px; }
             #joystick-base { display: block; }
         }
     </style>
@@ -161,12 +152,8 @@
 
 <header>
     <div class="left-sect">
-        <a href="index.html" class="back-link">←</a>
         <div class="logo">Last War <span>WAR MAP</span></div>
-        <div class="tool-item">
-            <span class="control-label">Color</span>
-            <input type="color" id="colorPicker" value="#0070f3">
-        </div>
+        <input type="color" id="colorPicker" value="#0070f3">
     </div>
 
     <div class="tool-bar">
@@ -176,24 +163,22 @@
         <button class="btn-tool" onclick="setMode('circle', this)">Circle</button>
         <button class="btn-tool" onclick="setMode('text', this)">Note</button>
         <button class="btn-tool" onclick="setMode('erase', this)">Erase</button>
-        
-        <div class="tool-item">
-            <span class="control-label">Size <span id="sizeVal" style="color: var(--accent);">4</span></span>
-            <input type="range" id="brushSize" min="1" max="60" value="4" oninput="document.getElementById('sizeVal').innerText = this.value">
-        </div>
+        <input type="range" id="brushSize" min="1" max="60" value="4">
     </div>
 
     <div class="header-actions">
         <button onclick="undo()">Undo</button>
-        <button onclick="clearMap()" style="color: #ff4d4d; border-color: rgba(255,0,0,0.1);">Clear</button>
-        <button id="btn-save" onclick="downloadMap()">Export PNG</button>
+        <button onclick="clearMap()" style="color: #ff4d4d;">Clear</button>
+        <button id="btn-save" onclick="downloadMap()">Export</button>
     </div>
 </header>
 
 <main id="map-container">
-    <div id="canvas-stack">
-        <canvas id="map-layer"></canvas>
-        <canvas id="draw-layer"></canvas>
+    <div id="scroll-spacer">
+        <div id="canvas-stack">
+            <canvas id="map-layer"></canvas>
+            <canvas id="draw-layer"></canvas>
+        </div>
     </div>
     <div class="coords-panel" id="coords">0, 0</div>
 </main>
@@ -210,14 +195,13 @@
     const dctx = drawC.getContext('2d');
     
     let isDrawing = false;
-    let startX, startY;
+    let startX, startY, snapshot;
     let currentMode = 'paint';
-    let snapshot = null;
     let history = [];
 
+    // Load Map
     const mapImg = new Image();
     mapImg.src = 'images/map2.png'; 
-
     mapImg.onload = () => {
         const w = 1100, h = 825;
         mapC.width = drawC.width = w;
@@ -225,68 +209,51 @@
         document.getElementById('canvas-stack').style.width = w + 'px';
         document.getElementById('canvas-stack').style.height = h + 'px';
         mctx.drawImage(mapImg, 0, 0, w, h);
+        
+        // Center the map on load
+        container.scrollLeft = (1100 / 2);
+        container.scrollTop = (825 / 2);
         saveState();
     };
 
-    mapImg.onerror = () => {
-        const w = 1100, h = 825;
-        mapC.width = drawC.width = w;
-        mapC.height = drawC.height = h;
-        mctx.fillStyle = "#111"; 
-        mctx.fillRect(0,0,w,h);
-        saveState();
-    };
-
-    // --- ENHANCED JOYSTICK & PANNING LOGIC ---
+    // Joystick Logic
     const jBase = document.getElementById('joystick-base');
     const jStick = document.getElementById('joystick-stick');
     let jActive = false;
     let jInput = { x: 0, y: 0 };
 
-    const handleJoystick = (e) => {
-        if (!jActive) return;
+    jBase.addEventListener('touchstart', (e) => { jActive = true; });
+    window.addEventListener('touchmove', (e) => { 
+        if(!jActive) return;
+        e.preventDefault();
         const touch = e.touches[0];
         const rect = jBase.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
         let dx = touch.clientX - centerX;
         let dy = touch.clientY - centerY;
-        const maxDist = rect.width / 2;
-        const dist = Math.min(Math.sqrt(dx*dx + dy*dy), maxDist);
+        const dist = Math.min(Math.sqrt(dx*dx + dy*dy), rect.width / 2);
         const angle = Math.atan2(dy, dx);
-        
-        const moveX = Math.cos(angle) * dist;
-        const moveY = Math.sin(angle) * dist;
-        jStick.style.transform = `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px))`;
-        
-        // Speed scaling
-        jInput.x = (moveX / maxDist);
-        jInput.y = (moveY / maxDist);
-    };
-
-    jBase.addEventListener('touchstart', (e) => { jActive = true; e.stopPropagation(); });
-    window.addEventListener('touchmove', (e) => { 
-        if(jActive) { 
-            e.preventDefault(); 
-            handleJoystick(e); 
-        } 
+        jStick.style.transform = `translate(calc(-50% + ${Math.cos(angle)*dist}px), calc(-50% + ${Math.sin(angle)*dist}px))`;
+        jInput.x = (Math.cos(angle) * dist) / (rect.width / 2);
+        jInput.y = (Math.sin(angle) * dist) / (rect.width / 2);
     }, {passive: false});
+
     window.addEventListener('touchend', () => { 
         jActive = false; jInput = { x: 0, y: 0 }; 
         jStick.style.transform = `translate(-50%, -50%)`;
     });
 
-    function updatePan() {
+    function panLoop() {
         if (jInput.x !== 0 || jInput.y !== 0) {
-            // Speed factor 15 allows for fast travel across the 1100px width
-            container.scrollLeft += jInput.x * 15;
-            container.scrollTop += jInput.y * 15;
+            container.scrollLeft += jInput.x * 16;
+            container.scrollTop += jInput.y * 16;
         }
-        requestAnimationFrame(updatePan);
+        requestAnimationFrame(panLoop);
     }
-    updatePan();
+    panLoop();
 
-    // --- DRAWING LOGIC ---
+    // Drawing Logic
     function setMode(mode, btn) {
         currentMode = mode;
         document.querySelectorAll('.btn-tool').forEach(b => b.classList.remove('active'));
@@ -294,21 +261,18 @@
     }
 
     function saveState() {
-        if (history.length > 25) history.shift();
+        if (history.length > 20) history.shift();
         history.push(dctx.getImageData(0, 0, drawC.width, drawC.height));
     }
 
     function undo() {
-        if (history.length > 1) {
-            history.pop();
-            dctx.putImageData(history[history.length - 1], 0, 0);
-        }
+        if (history.length > 1) { history.pop(); dctx.putImageData(history[history.length - 1], 0, 0); }
     }
 
     const getPos = (e) => {
         const rect = drawC.getBoundingClientRect();
-        let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         return { 
             x: (clientX - rect.left) * (drawC.width / rect.width), 
             y: (clientY - rect.top) * (drawC.height / rect.height) 
@@ -317,66 +281,45 @@
 
     const startDraw = (e) => {
         const p = getPos(e);
-        isDrawing = true;
-        startX = p.x; startY = p.y;
+        isDrawing = true; startX = p.x; startY = p.y;
         dctx.strokeStyle = document.getElementById('colorPicker').value;
         dctx.lineWidth = document.getElementById('brushSize').value;
         dctx.lineCap = dctx.lineJoin = 'round';
-
-        if (currentMode === 'paint' || currentMode === 'erase') {
-            dctx.beginPath(); dctx.moveTo(p.x, p.y);
-        } else if (['rect', 'circle', 'line'].includes(currentMode)) {
-            snapshot = dctx.getImageData(0, 0, drawC.width, drawC.height);
-        } else if (currentMode === 'text') {
-            const txt = prompt("Note:");
-            if (txt) {
-                dctx.fillStyle = document.getElementById('colorPicker').value;
-                dctx.font = `600 ${document.getElementById('brushSize').value * 3}px sans-serif`;
-                dctx.fillText(txt, p.x, p.y);
-                saveState();
-            }
-            isDrawing = false;
-        }
+        if (currentMode === 'paint' || currentMode === 'erase') { dctx.beginPath(); dctx.moveTo(p.x, p.y); }
+        else { snapshot = dctx.getImageData(0, 0, drawC.width, drawC.height); }
     };
 
     const moveDraw = (e) => {
         const p = getPos(e);
         document.getElementById('coords').innerText = `${Math.round(p.x)}, ${Math.round(p.y)}`;
         if (!isDrawing) return;
-
         if (currentMode === 'paint' || currentMode === 'erase') {
             dctx.globalCompositeOperation = (currentMode === 'erase') ? 'destination-out' : 'source-over';
             dctx.lineTo(p.x, p.y); dctx.stroke();
-        } else if (['rect', 'circle', 'line'].includes(currentMode)) {
+        } else {
             dctx.putImageData(snapshot, 0, 0);
             dctx.beginPath();
             if (currentMode === 'rect') dctx.strokeRect(startX, startY, p.x - startX, p.y - startY);
             else if (currentMode === 'circle') {
-                let r = Math.sqrt(Math.pow(p.x - startX, 2) + Math.pow(p.y - startY, 2));
-                dctx.arc(startX, startY, r, 0, 2 * Math.PI); dctx.stroke();
-            } else if (currentMode === 'line') {
-                dctx.moveTo(startX, startY); dctx.lineTo(p.x, p.y); dctx.stroke();
-            }
+                let r = Math.sqrt(Math.pow(p.x-startX,2)+Math.pow(p.y-startY,2));
+                dctx.arc(startX, startY, r, 0, 2*Math.PI); dctx.stroke();
+            } else if (currentMode === 'line') { dctx.moveTo(startX, startY); dctx.lineTo(p.x, p.y); dctx.stroke(); }
         }
     };
 
-    drawC.onmousedown = startDraw;
-    drawC.onmousemove = moveDraw;
-    window.onmouseup = () => { if (isDrawing) saveState(); isDrawing = false; };
+    drawC.addEventListener('mousedown', startDraw);
+    window.addEventListener('mousemove', moveDraw);
+    window.addEventListener('mouseup', () => { if(isDrawing) saveState(); isDrawing = false; });
 
-    drawC.addEventListener('touchstart', (e) => { if (e.target === drawC) e.preventDefault(); startDraw(e); }, { passive: false });
-    drawC.addEventListener('touchmove', (e) => { if (e.target === drawC) e.preventDefault(); moveDraw(e); }, { passive: false });
-    drawC.addEventListener('touchend', () => { if (isDrawing) saveState(); isDrawing = false; });
+    drawC.addEventListener('touchstart', (e) => { if(e.target===drawC) e.preventDefault(); startDraw(e); }, {passive:false});
+    drawC.addEventListener('touchmove', (e) => { if(e.target===drawC) e.preventDefault(); moveDraw(e); }, {passive:false});
+    drawC.addEventListener('touchend', () => { if(isDrawing) saveState(); isDrawing = false; });
 
-    function clearMap() { if(confirm("Clear markings?")) { dctx.clearRect(0,0,drawC.width, drawC.height); saveState(); } }
+    function clearMap() { if(confirm("Clear?")) { dctx.clearRect(0,0,drawC.width,drawC.height); saveState(); } }
     function downloadMap() {
-        const finalCanvas = document.createElement('canvas');
-        finalCanvas.width = mapC.width; finalCanvas.height = mapC.height;
-        const fctx = finalCanvas.getContext('2d');
-        fctx.drawImage(mapC, 0, 0); fctx.drawImage(drawC, 0, 0);
-        const link = document.createElement('a');
-        link.download = `Tactical-Map.png`;
-        link.href = finalCanvas.toDataURL(); link.click();
+        const out = document.createElement('canvas'); out.width=1100; out.height=825;
+        const octx = out.getContext('2d'); octx.drawImage(mapC,0,0); octx.drawImage(drawC,0,0);
+        const link = document.createElement('a'); link.download='map.png'; link.href=out.toDataURL(); link.click();
     }
 </script>
 
