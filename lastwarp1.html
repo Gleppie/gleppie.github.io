@@ -261,9 +261,15 @@
 
     const getPos = (e) => {
         const rect = drawC.getBoundingClientRect();
-        // Support touch events
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        // Support touch events vs mouse events
+        let clientX, clientY;
+        if (e.touches && e.touches.length > 0) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
         
         return { 
             x: (clientX - rect.left) * (drawC.width / rect.width), 
@@ -330,10 +336,20 @@
     drawC.onmousemove = moveDraw;
     window.onmouseup = endDraw;
 
-    // Touch listeners
-    drawC.ontouchstart = (e) => { e.preventDefault(); startDraw(e); };
-    drawC.ontouchmove = (e) => { e.preventDefault(); moveDraw(e); };
-    drawC.ontouchend = endDraw;
+    // Touch listeners for mobile support
+    drawC.addEventListener('touchstart', (e) => {
+        if (e.target === drawC) e.preventDefault();
+        startDraw(e);
+    }, { passive: false });
+
+    drawC.addEventListener('touchmove', (e) => {
+        if (e.target === drawC) e.preventDefault();
+        moveDraw(e);
+    }, { passive: false });
+
+    drawC.addEventListener('touchend', (e) => {
+        endDraw();
+    }, { passive: false });
 
     function clearMap() {
         if(confirm("Clear markings?")) {
