@@ -13,9 +13,7 @@
             --accent: #0070f3;
             --border: #eaeaea;
             --card-hover: #f0f0f0;
-            --modal-bg: rgba(255, 255, 255, 0.98);
-            --panel-bg: rgba(255, 255, 255, 0.9);
-            --tag-bg: #eeeeee;
+            --panel-bg: rgba(255, 255, 255, 0.8);
         }
 
         @media (prefers-color-scheme: dark) {
@@ -26,9 +24,7 @@
                 --accent: #3291ff;
                 --border: #222222;
                 --card-hover: #161616;
-                --modal-bg: rgba(10, 10, 10, 0.98);
-                --panel-bg: rgba(10, 10, 10, 0.85);
-                --tag-bg: #222222;
+                --panel-bg: rgba(30, 30, 30, 0.7);
             }
         }
 
@@ -43,7 +39,6 @@
             overflow: hidden;
         }
 
-        /* --- Header --- */
         header {
             background-color: var(--bg-color);
             padding: 8px 16px;
@@ -54,22 +49,10 @@
             z-index: 100;
         }
 
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .tool-bar {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding-bottom: 4px;
-            flex-wrap: wrap;
-        }
-
+        .top-bar { display: flex; justify-content: space-between; align-items: center; }
+        .tool-bar { display: flex; align-items: center; gap: 12px; padding-bottom: 4px; flex-wrap: wrap; }
         .logo { font-weight: 700; font-size: 1rem; letter-spacing: -0.5px; }
-        .logo span { display: none; } /* Hide sub-text on small headers */
+        .logo span { display: none; }
 
         @media (min-width: 600px) {
             .logo { font-size: 1.1rem; }
@@ -79,60 +62,37 @@
         .header-actions { display: flex; gap: 6px; }
 
         button {
-            background: none; 
-            border: 1px solid var(--border);
-            color: var(--text-dim);
-            padding: 8px 12px; 
-            cursor: pointer; 
-            border-radius: 6px;
-            font-size: 0.75rem; 
-            font-weight: 500;
-            transition: 0.2s;
-            white-space: nowrap;
-            touch-action: manipulation;
+            background: none; border: 1px solid var(--border); color: var(--text-dim);
+            padding: 8px 12px; cursor: pointer; border-radius: 6px; font-size: 0.75rem; 
+            font-weight: 500; transition: 0.2s; white-space: nowrap; touch-action: manipulation;
         }
 
         button:hover { border-color: var(--text-main); color: var(--text-main); background: var(--card-hover); }
         button.active { background: var(--accent); color: white; border-color: var(--accent); }
+        #btn-save { background: var(--accent) !important; color: white !important; border: none !important; }
 
-        #btn-save {
-            background: var(--accent) !important;
-            color: white !important;
-            border: none !important;
-        }
-
-        /* --- Tool Elements --- */
         .tool-item { display: flex; align-items: center; gap: 8px; }
         .control-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); }
 
-        input[type="color"] { 
-            width: 28px; height: 28px; border: 1px solid var(--border); border-radius: 4px; 
-            padding: 0; cursor: pointer; background: none;
-        }
-
+        input[type="color"] { width: 28px; height: 28px; border: 1px solid var(--border); border-radius: 4px; padding: 0; cursor: pointer; background: none; }
         input[type="range"] { accent-color: var(--accent); cursor: pointer; width: 60px; }
 
-        /* --- Main Canvas Area --- */
         main {
             flex-grow: 1;
             position: relative;
             background-color: var(--card-hover);
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Better for scrolling on mobile */
-            overflow: auto;
-            padding: 10px;
-            -webkit-overflow-scrolling: touch;
+            align-items: center;
+            overflow: hidden; 
+            padding: 20px;
         }
 
         #canvas-stack {
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-            border: 1px solid var(--border);
-            border-radius: 8px;
             background: #000;
-            max-width: 100%;
-            height: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border-radius: 4px;
         }
 
         canvas { position: absolute; top: 0; left: 0; cursor: crosshair; touch-action: none; }
@@ -140,11 +100,11 @@
 
         .coords-panel {
             position: fixed;
-            bottom: 15px;
-            right: 15px;
+            bottom: 20px;
+            right: 20px;
             background: var(--panel-bg);
-            backdrop-filter: blur(8px);
-            padding: 4px 10px;
+            backdrop-filter: blur(10px);
+            padding: 4px 12px;
             border-radius: 20px;
             border: 1px solid var(--border);
             font-size: 0.7rem;
@@ -154,13 +114,41 @@
             pointer-events: none;
         }
 
+        /* --- Joystick UI --- */
+        #joystick-base {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 80px;
+            height: 80px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            z-index: 2000;
+            display: none; /* Mobile Only */
+            touch-action: none;
+        }
+
+        #joystick-stick {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
         .back-link { font-size: 0.8rem; color: var(--text-dim); text-decoration: none; margin-right: 12px; }
 
-        /* Tablet/Mobile Adjustments */
         @media (max-width: 768px) {
+            main { justify-content: flex-start; align-items: flex-start; padding: 0; }
+            #joystick-base { display: block; }
             .tool-bar { gap: 8px; justify-content: center; }
             .header-actions { width: 100%; justify-content: space-between; order: 3; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 4px;}
-            input[type="range"] { width: 50px; }
         }
     </style>
 </head>
@@ -199,7 +187,7 @@
     </div>
 </header>
 
-<main>
+<main id="map-container">
     <div id="canvas-stack">
         <canvas id="map-layer"></canvas>
         <canvas id="draw-layer"></canvas>
@@ -207,7 +195,12 @@
     <div class="coords-panel" id="coords">0, 0</div>
 </main>
 
+<div id="joystick-base">
+    <div id="joystick-stick"></div>
+</div>
+
 <script>
+    const container = document.getElementById('map-container');
     const mapC = document.getElementById('map-layer');
     const drawC = document.getElementById('draw-layer');
     const mctx = mapC.getContext('2d');
@@ -241,6 +234,53 @@
         saveState();
     };
 
+    // --- JOYSTICK LOGIC ---
+    const jBase = document.getElementById('joystick-base');
+    const jStick = document.getElementById('joystick-stick');
+    let jActive = false;
+    let jInput = { x: 0, y: 0 };
+
+    const handleJoystick = (e) => {
+        if (!jActive) return;
+        const touch = e.touches[0];
+        const rect = jBase.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        let dx = touch.clientX - centerX;
+        let dy = touch.clientY - centerY;
+        const dist = Math.min(Math.sqrt(dx*dx + dy*dy), rect.width / 2);
+        const angle = Math.atan2(dy, dx);
+
+        const moveX = Math.cos(angle) * dist;
+        const moveY = Math.sin(angle) * dist;
+
+        jStick.style.transform = `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px))`;
+        
+        // Normalize input for scrolling (-1 to 1)
+        jInput.x = moveX / (rect.width / 2);
+        jInput.y = moveY / (rect.height / 2);
+    };
+
+    jBase.addEventListener('touchstart', (e) => { jActive = true; });
+    window.addEventListener('touchmove', (e) => { if(jActive) { e.preventDefault(); handleJoystick(e); } }, {passive: false});
+    window.addEventListener('touchend', () => { 
+        jActive = false; 
+        jInput = { x: 0, y: 0 }; 
+        jStick.style.transform = `translate(-50%, -50%)`;
+    });
+
+    // Panning loop
+    function updatePan() {
+        if (jInput.x !== 0 || jInput.y !== 0) {
+            container.scrollLeft += jInput.x * 12; // Scroll Speed
+            container.scrollTop += jInput.y * 12;
+        }
+        requestAnimationFrame(updatePan);
+    }
+    updatePan();
+
+    // --- DRAWING LOGIC ---
     function setMode(mode, btn) {
         currentMode = mode;
         document.querySelectorAll('.btn-tool').forEach(b => b.classList.remove('active'));
@@ -261,16 +301,8 @@
 
     const getPos = (e) => {
         const rect = drawC.getBoundingClientRect();
-        // Support touch events vs mouse events
-        let clientX, clientY;
-        if (e.touches && e.touches.length > 0) {
-            clientX = e.touches[0].clientX;
-            clientY = e.touches[0].clientY;
-        } else {
-            clientX = e.clientX;
-            clientY = e.clientY;
-        }
-        
+        let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        let clientY = e.touches ? e.touches[0].clientY : e.clientY;
         return { 
             x: (clientX - rect.left) * (drawC.width / rect.width), 
             y: (clientY - rect.top) * (drawC.height / rect.height) 
@@ -281,23 +313,19 @@
         const p = getPos(e);
         isDrawing = true;
         startX = p.x; startY = p.y;
-        
-        dctx.globalAlpha = 1.0; 
         dctx.strokeStyle = document.getElementById('colorPicker').value;
         dctx.lineWidth = document.getElementById('brushSize').value;
-        dctx.lineCap = 'round';
-        dctx.lineJoin = 'round';
+        dctx.lineCap = dctx.lineJoin = 'round';
 
         if (currentMode === 'paint' || currentMode === 'erase') {
-            dctx.beginPath();
-            dctx.moveTo(p.x, p.y);
+            dctx.beginPath(); dctx.moveTo(p.x, p.y);
         } else if (['rect', 'circle', 'line'].includes(currentMode)) {
             snapshot = dctx.getImageData(0, 0, drawC.width, drawC.height);
         } else if (currentMode === 'text') {
             const txt = prompt("Note:");
             if (txt) {
                 dctx.fillStyle = document.getElementById('colorPicker').value;
-                dctx.font = `600 ${document.getElementById('brushSize').value * 3}px -apple-system, sans-serif`;
+                dctx.font = `600 ${document.getElementById('brushSize').value * 3}px sans-serif`;
                 dctx.fillText(txt, p.x, p.y);
                 saveState();
             }
@@ -312,62 +340,37 @@
 
         if (currentMode === 'paint' || currentMode === 'erase') {
             dctx.globalCompositeOperation = (currentMode === 'erase') ? 'destination-out' : 'source-over';
-            dctx.lineTo(p.x, p.y);
-            dctx.stroke();
+            dctx.lineTo(p.x, p.y); dctx.stroke();
         } else if (['rect', 'circle', 'line'].includes(currentMode)) {
             dctx.putImageData(snapshot, 0, 0);
-            dctx.globalCompositeOperation = 'source-over';
             dctx.beginPath();
             if (currentMode === 'rect') dctx.strokeRect(startX, startY, p.x - startX, p.y - startY);
             else if (currentMode === 'circle') {
                 let r = Math.sqrt(Math.pow(p.x - startX, 2) + Math.pow(p.y - startY, 2));
-                dctx.arc(startX, startY, r, 0, 2 * Math.PI);
-                dctx.stroke();
+                dctx.arc(startX, startY, r, 0, 2 * Math.PI); dctx.stroke();
             } else if (currentMode === 'line') {
                 dctx.moveTo(startX, startY); dctx.lineTo(p.x, p.y); dctx.stroke();
             }
         }
     };
 
-    const endDraw = () => { if (isDrawing) saveState(); isDrawing = false; };
-
-    // Mouse listeners
     drawC.onmousedown = startDraw;
     drawC.onmousemove = moveDraw;
-    window.onmouseup = endDraw;
+    window.onmouseup = () => { if (isDrawing) saveState(); isDrawing = false; };
 
-    // Touch listeners for mobile support
-    drawC.addEventListener('touchstart', (e) => {
-        if (e.target === drawC) e.preventDefault();
-        startDraw(e);
-    }, { passive: false });
+    drawC.addEventListener('touchstart', (e) => { if (e.target === drawC) e.preventDefault(); startDraw(e); }, { passive: false });
+    drawC.addEventListener('touchmove', (e) => { if (e.target === drawC) e.preventDefault(); moveDraw(e); }, { passive: false });
+    drawC.addEventListener('touchend', () => { if (isDrawing) saveState(); isDrawing = false; });
 
-    drawC.addEventListener('touchmove', (e) => {
-        if (e.target === drawC) e.preventDefault();
-        moveDraw(e);
-    }, { passive: false });
-
-    drawC.addEventListener('touchend', (e) => {
-        endDraw();
-    }, { passive: false });
-
-    function clearMap() {
-        if(confirm("Clear markings?")) {
-            dctx.clearRect(0,0,drawC.width, drawC.height);
-            saveState();
-        }
-    }
-
+    function clearMap() { if(confirm("Clear markings?")) { dctx.clearRect(0,0,drawC.width, drawC.height); saveState(); } }
     function downloadMap() {
         const finalCanvas = document.createElement('canvas');
         finalCanvas.width = mapC.width; finalCanvas.height = mapC.height;
         const fctx = finalCanvas.getContext('2d');
-        fctx.drawImage(mapC, 0, 0);
-        fctx.drawImage(drawC, 0, 0);
+        fctx.drawImage(mapC, 0, 0); fctx.drawImage(drawC, 0, 0);
         const link = document.createElement('a');
         link.download = `Tactical-Map.png`;
-        link.href = finalCanvas.toDataURL();
-        link.click();
+        link.href = finalCanvas.toDataURL(); link.click();
     }
 </script>
 
