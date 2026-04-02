@@ -70,20 +70,18 @@
         input[type="color"] { width: 22px; height: 22px; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; }
         input[type="range"] { accent-color: var(--accent); cursor: pointer; width: 50px; }
 
-        /* --- Map Viewport --- */
         main {
             flex-grow: 1;
             position: relative;
             background-color: var(--card-hover);
-            overflow: auto; /* Enable scrolling */
-            display: block; /* Important for padding to work */
+            overflow: auto;
+            display: block;
             -webkit-overflow-scrolling: touch;
         }
 
-        /* The Spacer provides the "Extra Room" to scroll past edges */
         #scroll-spacer {
             position: relative;
-            padding: 50vh 50vw; /* 50% of screen size padding on all sides */
+            padding: 60vh 60vw; 
             display: inline-block;
         }
 
@@ -112,7 +110,6 @@
             pointer-events: none;
         }
 
-        /* --- Joystick --- */
         #joystick-base {
             position: fixed;
             bottom: 40px;
@@ -126,7 +123,6 @@
             z-index: 2000;
             display: none; 
             touch-action: none;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
         }
 
         #joystick-stick {
@@ -199,7 +195,6 @@
     let currentMode = 'paint';
     let history = [];
 
-    // Load Map
     const mapImg = new Image();
     mapImg.src = 'images/map2.png'; 
     mapImg.onload = () => {
@@ -209,14 +204,12 @@
         document.getElementById('canvas-stack').style.width = w + 'px';
         document.getElementById('canvas-stack').style.height = h + 'px';
         mctx.drawImage(mapImg, 0, 0, w, h);
-        
-        // Center the map on load
         container.scrollLeft = (1100 / 2);
         container.scrollTop = (825 / 2);
         saveState();
     };
 
-    // Joystick Logic
+    // Joystick 
     const jBase = document.getElementById('joystick-base');
     const jStick = document.getElementById('joystick-stick');
     let jActive = false;
@@ -253,7 +246,7 @@
     }
     panLoop();
 
-    // Drawing Logic
+    // Tools
     function setMode(mode, btn) {
         currentMode = mode;
         document.querySelectorAll('.btn-tool').forEach(b => b.classList.remove('active'));
@@ -261,7 +254,7 @@
     }
 
     function saveState() {
-        if (history.length > 20) history.shift();
+        if (history.length > 25) history.shift();
         history.push(dctx.getImageData(0, 0, drawC.width, drawC.height));
     }
 
@@ -281,45 +274,75 @@
 
     const startDraw = (e) => {
         const p = getPos(e);
-        isDrawing = true; startX = p.x; startY = p.y;
+        
+        // Fix for Note Button
+        if (currentMode === 'text') {
+            const txt = prompt("Enter Note:");
+            if (txt) {
+                dctx.fillStyle = document.getElementById('colorPicker').value;
+                const fontSize = parseInt(document.getElementById('brushSize').value) * 2.5;
+                dctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, sans-serif`;
+                dctx.fillText(txt, p.x, p.y);
+                saveState();
+            }
+            isDrawing = false;
+            return;
+        }
+
+        isDrawing = true; 
+        startX = p.x; startY = p.y;
         dctx.strokeStyle = document.getElementById('colorPicker').value;
         dctx.lineWidth = document.getElementById('brushSize').value;
         dctx.lineCap = dctx.lineJoin = 'round';
-        if (currentMode === 'paint' || currentMode === 'erase') { dctx.beginPath(); dctx.moveTo(p.x, p.y); }
-        else { snapshot = dctx.getImageData(0, 0, drawC.width, drawC.height); }
+        dctx.globalCompositeOperation = (currentMode === 'erase') ? 'destination-out' : 'source-over';
+
+        if (currentMode === 'paint' || currentMode === 'erase') { 
+            dctx.beginPath(); 
+            dctx.moveTo(p.x, p.y); 
+        } else { 
+            snapshot = dctx.getImageData(0, 0, drawC.width, drawC.height); 
+        }
     };
 
     const moveDraw = (e) => {
         const p = getPos(e);
         document.getElementById('coords').innerText = `${Math.round(p.x)}, ${Math.round(p.y)}`;
         if (!isDrawing) return;
+        
         if (currentMode === 'paint' || currentMode === 'erase') {
-            dctx.globalCompositeOperation = (currentMode === 'erase') ? 'destination-out' : 'source-over';
-            dctx.lineTo(p.x, p.y); dctx.stroke();
-        } else {
+            dctx.lineTo(p.x, p.y); 
+            dctx.stroke();
+        } else if (['rect', 'circle', 'line'].includes(currentMode)) {
             dctx.putImageData(snapshot, 0, 0);
             dctx.beginPath();
             if (currentMode === 'rect') dctx.strokeRect(startX, startY, p.x - startX, p.y - startY);
             else if (currentMode === 'circle') {
                 let r = Math.sqrt(Math.pow(p.x-startX,2)+Math.pow(p.y-startY,2));
-                dctx.arc(startX, startY, r, 0, 2*Math.PI); dctx.stroke();
-            } else if (currentMode === 'line') { dctx.moveTo(startX, startY); dctx.lineTo(p.x, p.y); dctx.stroke(); }
+                dctx.arc(startX, startY, r, 0, 2*Math.PI); 
+                dctx.stroke();
+            } else if (currentMode === 'line') { 
+                dctx.moveTo(startX, startY); 
+                dctx.lineTo(p.x, p.y); 
+                dctx.stroke(); 
+            }
         }
     };
 
-    drawC.addEventListener('mousedown', startDraw);
-    window.addEventListener('mousemove', moveDraw);
-    window.addEventListener('mouseup', () => { if(isDrawing) saveState(); isDrawing = false; });
+    const endDraw = () => { if(isDrawing) saveState(); isDrawing = false; };
+
+    drawC.onmousedown = startDraw;
+    window.onmousemove = moveDraw;
+    window.onmouseup = endDraw;
 
     drawC.addEventListener('touchstart', (e) => { if(e.target===drawC) e.preventDefault(); startDraw(e); }, {passive:false});
     drawC.addEventListener('touchmove', (e) => { if(e.target===drawC) e.preventDefault(); moveDraw(e); }, {passive:false});
-    drawC.addEventListener('touchend', () => { if(isDrawing) saveState(); isDrawing = false; });
+    drawC.addEventListener('touchend', endDraw);
 
     function clearMap() { if(confirm("Clear?")) { dctx.clearRect(0,0,drawC.width,drawC.height); saveState(); } }
     function downloadMap() {
         const out = document.createElement('canvas'); out.width=1100; out.height=825;
         const octx = out.getContext('2d'); octx.drawImage(mapC,0,0); octx.drawImage(drawC,0,0);
-        const link = document.createElement('a'); link.download='map.png'; link.href=out.toDataURL(); link.click();
+        const link = document.createElement('a'); link.download='tactical_map.png'; link.href=out.toDataURL(); link.click();
     }
 </script>
 
