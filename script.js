@@ -197,3 +197,34 @@ async function sendFooterContact() {
         btn.disabled = false;
     }
 }
+
+// Live User Counter Simulation
+function updateLiveCounter() {
+    const counterElement = document.getElementById('user-count');
+    
+    // Logic: Start with a base number (e.g., 2)
+    // Add a random small fluctuation to make it feel "Live"
+    let currentCount = parseInt(counterElement.innerText);
+    
+    // 20% chance to go up, 20% chance to go down, 60% chance to stay
+    let rand = Math.random();
+    if (rand > 0.8) {
+        currentCount += 1;
+    } else if (rand < 0.2 && currentCount > 1) {
+        currentCount -= 1;
+    }
+    
+    // Cap it so it doesn't look fake (stay between 1 and 7 for a personal portfolio)
+    if (currentCount > 7) currentCount = 5;
+    if (currentCount < 1) currentCount = 1;
+
+    counterElement.innerText = currentCount;
+}
+
+// Update every 10-15 seconds for realism
+setInterval(updateLiveCounter, 12000);
+
+// Initialize with a realistic start
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('user-count').innerText = Math.floor(Math.random() * 3) + 1;
+});
