@@ -595,3 +595,34 @@ footer {
         align-items: center;
     }
 }
+
+
+
+/*Last war */
+/* --- Annotator Pro Specifics --- */
+.custom-file-input {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+}
+
+.custom-file-input::-webkit-file-upload-button {
+    background: var(--bg-input);
+    color: white;
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+#toolMenu a.active {
+    background: var(--accent-soft) !important;
+    color: var(--accent) !important;
+    font-weight: 700;
+}
+
+#canvas {
+    background: white;
+    cursor: crosshair;
+    max-width: 100%;
+}
