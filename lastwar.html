@@ -3,232 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Last War Survival Map | Glep's Bean Bag</title>
-        <link rel="stylesheet" href="style.css">
+        <title>Last War Map Tool| Bean Bag</title>
+    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
+  
+</head>
+<body>
 <body>
     <nav class="sidebar">
         <div class="brand">
-            <svg class="emblem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
-            <h1>MAP</h1>
+            <svg class="emblem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            <h1>Last War Map Tool</h1>
         </div>
         
         <ul id="toolMenu">
             <li><a href="index.html">← Back</a></li>
             <li class="section-label" style="font-size: 0.65rem; color: var(--accent); font-weight: 800; margin: 1.5rem 0 0.5rem 1rem; text-transform: uppercase;">Draw Tools</li>
-            <li><a href="#" class="btn-tool active" onclick="setMode('paint', this)">Brush</a></li>
-            <li><a href="#" class="btn-tool" onclick="setMode('line', this)">Line</a></li>
-            <li><a href="#" class="btn-tool" onclick="setMode('rect', this)">Box</a></li>
-            <li><a href="#" class="btn-tool" onclick="setMode('circle', this)">Circle</a></li>
-            <li><a href="#" class="btn-tool" onclick="setMode('text', this)">Tactical Note</a></li>
-            <li><a href="#" class="btn-tool" onclick="setMode('erase', this)" style="color: var(--danger);">Eraser</a></li>
+            <li><a href="#" onclick="setTool('brush')" id="brushBtn" class="active">Brush</a></li>
+            <li><a href="#" onclick="setTool('rect')" id="rectBtn">Rectangle</a></li>
+            <li><a href="#" onclick="setTool('arrow')" id="arrowBtn">Arrow</a></li>
+            <li><a href="#" onclick="setTool('label')" id="labelBtn">Alliance Names</a></li>
+            <li><a href="#" onclick="setTool('eraser')" id="eraserBtn" style="color: var(--danger);">🧽 Eraser</a></li>
         </ul>
 
-        <div class="control-panel" style="margin-top: 1.5rem; padding: 0 1rem; display: flex; flex-direction: column; gap: 1.25rem;">
+        <div class="control-panel" style="margin-top: 1rem; padding: 0 1rem; display: flex; flex-direction: column; gap: 1rem;">
             <div>
-                <span class="label-text">Color</span>
-                <input type="color" id="colorPicker" value="#6366f1" style="width: 100%; height: 35px; border: none; background: none; cursor: pointer;">
+                <span class="label-text">Alliance</span>
+                <select id="labelSelect" style="width: 100%; background: var(--bg-input); color: white; border: 1px solid var(--border); padding: 8px; border-radius: 6px; margin-top: 5px;">
+                    <option>HO1Y</option>
+                    <option>IRON</option>
+                    <option>GREY</option>
+                </select>
+                <div style="display: flex; gap: 5px; margin-top: 5px;">
+                    <input type="text" id="customText" placeholder="Custom..." style="flex: 1; background: var(--bg-input); border: 1px solid var(--border); color: white; padding: 8px; border-radius: 6px; font-size: 0.8rem;">
+                    <button onclick="addNewLabel()" style="background: var(--accent); color: white; border: none; padding: 0 10px; border-radius: 6px;">+</button>
+                </div>
             </div>
+
             <div>
-                <span class="label-text">Stroke Size: <strong id="sizeVal" style="color: var(--accent);">4</strong></span>
-                <input type="range" id="brushSize" min="1" max="60" value="4" oninput="document.getElementById('sizeVal').innerText = this.value" style="width: 100%; margin-top: 8px;">
+                <span class="label-text">Stroke & Size</span>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                    <input type="color" id="colorPicker" value="#ef4444" style="border: none; background: none; width: 30px; height: 30px; cursor: pointer;">
+                    <input type="range" id="sizePicker" min="2" max="100" value="15" style="flex: 1;">
+                </div>
             </div>
         </div>
 
         <div style="margin-top: auto; display: flex; flex-direction: column; gap: 8px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                <button onclick="undo()" style="background: var(--bg-input); color: white; border: 1px solid var(--border); padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer;">Undo</button>
-                <button onclick="clearMap()" style="background: rgba(248, 113, 113, 0.1); color: var(--danger); border: 1px solid rgba(248, 113, 113, 0.2); padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer;">Clear</button>
-            </div>
-            <button id="footerBtn" onclick="downloadMap()" style="width: 100%;">Export PNG</button>
+            <button onclick="undo()" style="background: var(--bg-input); color: white; border: 1px solid var(--border); padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer;">UNDO</button>
+            <button id="footerBtn" onclick="download()" style="width: 100%;">SAVE IMAGE</button>
         </div>
     </nav>
 
     <main class="main-content" style="max-width: none;">
         <div class="disclaimer-card" style="margin-bottom: 1.5rem; max-width: none;">
             <div class="disclaimer-header">
-                <svg class="emblem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 16V12"></path><path d="M12 8h.01"></path></svg>
-                <h2>Tactical Interface</h2>
+                <svg class="emblem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <h2>Quick Upload</h2>
             </div>
-            <p>Use the <strong>Joystick</strong> (Mobile) or <strong>Click-Drag</strong> (Desktop) to navigate the terrain. Current Coords: <span id="coords" style="color: var(--accent); font-weight: bold;">0, 0</span></p>
-        </div>
-
-        <div id="map-container" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: scroll; position: relative; height: calc(100vh - 200px);">
-            <div id="canvas-stack" style="position: relative; margin: 0 auto; cursor: crosshair;">
-                <canvas id="map-layer" style="position: absolute; top: 0; left: 0;"></canvas>
-                <canvas id="draw-layer" style="position: absolute; top: 0; left: 0; z-index: 5;"></canvas>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <p>Upload a screenshot or photo to begin marking up.</p>
+                <input type="file" id="upload" accept="image/*" class="custom-file-input">
             </div>
         </div>
 
-        <div id="joystick-base" style="position: fixed; bottom: 30px; right: 30px; width: 100px; height: 100px; background: rgba(0,0,0,0.5); border: 2px solid var(--border); border-radius: 50%; z-index: 1000; display: none;">
-            <div id="joystick-stick" style="position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; background: var(--accent); border-radius: 50%; transform: translate(-50%, -50%);"></div>
+        <div class="data-card" style="padding: 10px; display: flex; justify-content: center; overflow: auto; background: var(--bg-input); min-height: 400px; position: relative;">
+            <canvas id="canvas" style="display: none; box-shadow: 0 0 20px rgba(0,0,0,0.5);"></canvas>
+            <div id="noImageText" style="display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-dim); text-align: center;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 15px; opacity: 0.5;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                <p>This is meant for last war players, but it can be used for other purposes as well.</p>
+            </div>
         </div>
     </main>
-<script>
-    const container = document.getElementById('map-container');
-    const mapC = document.getElementById('map-layer');
-    const drawC = document.getElementById('draw-layer');
-    const mctx = mapC.getContext('2d');
-    const dctx = drawC.getContext('2d');
-    
-    let isDrawing = false;
-    let startX, startY;
-    let currentMode = 'paint';
-    let snapshot = null;
-    let history = [];
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const colorInput = document.getElementById('colorPicker');
+        const sizeInput = document.getElementById('sizePicker');
+        const upload = document.getElementById('upload');
+        const noImageText = document.getElementById('noImageText');
 
-    const mapImg = new Image();
-    mapImg.src = 'images/map2.png'; 
+        let tool = 'brush', isDrawing = false, startX, startY, snapshot;
+        let undoStack = [];
 
-    mapImg.onload = () => {
-        const w = 1100, h = 825;
-        mapC.width = drawC.width = w;
-        mapC.height = drawC.height = h;
-        document.getElementById('canvas-stack').style.width = w + 'px';
-        document.getElementById('canvas-stack').style.height = h + 'px';
-        mctx.drawImage(mapImg, 0, 0, w, h);
-        saveState();
-    };
+        // 1. Image Upload Logic
+        upload.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
 
-    mapImg.onerror = () => {
-        const w = 1100, h = 825;
-        mapC.width = drawC.width = w;
-        mapC.height = drawC.height = h;
-        mctx.fillStyle = "#111"; 
-        mctx.fillRect(0,0,w,h);
-        saveState();
-    };
-
-    const jBase = document.getElementById('joystick-base');
-    const jStick = document.getElementById('joystick-stick');
-    let jActive = false;
-    let jInput = { x: 0, y: 0 };
-
-    const handleJoystick = (e) => {
-        if (!jActive) return;
-        const touch = e.touches[0];
-        const rect = jBase.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        let dx = touch.clientX - centerX;
-        let dy = touch.clientY - centerY;
-        const dist = Math.min(Math.sqrt(dx*dx + dy*dy), rect.width / 2);
-        const angle = Math.atan2(dy, dx);
-        const moveX = Math.cos(angle) * dist;
-        const moveY = Math.sin(angle) * dist;
-        jStick.style.transform = `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px))`;
-        jInput.x = moveX / (rect.width / 2);
-        jInput.y = moveY / (rect.height / 2);
-    };
-
-    jBase.addEventListener('touchstart', (e) => { jActive = true; });
-    window.addEventListener('touchmove', (e) => { if(jActive) { e.preventDefault(); handleJoystick(e); } }, {passive: false});
-    window.addEventListener('touchend', () => { 
-        jActive = false; jInput = { x: 0, y: 0 }; 
-        jStick.style.transform = `translate(-50%, -50%)`;
-    });
-
-    function updatePan() {
-        if (jInput.x !== 0 || jInput.y !== 0) {
-            container.scrollLeft += jInput.x * 12;
-            container.scrollTop += jInput.y * 12;
-        }
-        requestAnimationFrame(updatePan);
-    }
-    updatePan();
-
-    function setMode(mode, btn) {
-        currentMode = mode;
-        document.querySelectorAll('.btn-tool').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    }
-
-    function saveState() {
-        if (history.length > 25) history.shift();
-        history.push(dctx.getImageData(0, 0, drawC.width, drawC.height));
-    }
-
-    function undo() {
-        if (history.length > 1) {
-            history.pop();
-            dctx.putImageData(history[history.length - 1], 0, 0);
-        }
-    }
-
-    const getPos = (e) => {
-        const rect = drawC.getBoundingClientRect();
-        let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return { 
-            x: (clientX - rect.left) * (drawC.width / rect.width), 
-            y: (clientY - rect.top) * (drawC.height / rect.height) 
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    noImageText.style.display = 'none';
+                    canvas.style.display = 'block';
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    undoStack = []; // Reset undo for new image
+                    saveState();
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
         };
-    };
 
-    const startDraw = (e) => {
-        const p = getPos(e);
-        isDrawing = true;
-        startX = p.x; startY = p.y;
-        dctx.strokeStyle = document.getElementById('colorPicker').value;
-        dctx.lineWidth = document.getElementById('brushSize').value;
-        dctx.lineCap = dctx.lineJoin = 'round';
+        // 2. Tool Management
+        function setTool(t) {
+            tool = t;
+            document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            if(document.getElementById(t + 'Btn')) document.getElementById(t + 'Btn').classList.add('active');
+        }
 
-        if (currentMode === 'paint' || currentMode === 'erase') {
-            dctx.beginPath(); dctx.moveTo(p.x, p.y);
-        } else if (['rect', 'circle', 'line'].includes(currentMode)) {
-            snapshot = dctx.getImageData(0, 0, drawC.width, drawC.height);
-        } else if (currentMode === 'text') {
-            const txt = prompt("Note:");
-            if (txt) {
-                dctx.fillStyle = document.getElementById('colorPicker').value;
-                dctx.font = `600 ${document.getElementById('brushSize').value * 3}px sans-serif`;
-                dctx.fillText(txt, p.x, p.y);
+        function addNewLabel() {
+            const val = document.getElementById('customText').value;
+            if(val) {
+                const opt = document.createElement('option');
+                opt.text = val;
+                document.getElementById('labelSelect').add(opt);
+                document.getElementById('labelSelect').value = val;
+                document.getElementById('customText').value = "";
+                setTool('label');
+            }
+        }
+
+        // 3. Drawing Engine
+        canvas.onmousedown = (e) => {
+            if (undoStack.length === 0) return; // Don't draw if no image
+            
+            isDrawing = true;
+            startX = e.offsetX;
+            startY = e.offsetY;
+            snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+            // Brush/Eraser Prep
+            ctx.strokeStyle = (tool === 'eraser') ? '#ffffff' : colorInput.value;
+            ctx.lineWidth = sizeInput.value;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            if (tool === 'label') {
+                ctx.fillStyle = ctx.strokeStyle;
+                ctx.font = `bold ${ctx.lineWidth * 2}px Arial`;
+                ctx.fillText(document.getElementById('labelSelect').value, startX, startY);
                 saveState();
+                isDrawing = false;
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
             }
-            isDrawing = false;
+        };
+
+        canvas.onmousemove = (e) => {
+            if (!isDrawing) return;
+
+            if (tool === 'brush' || tool === 'eraser') {
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.stroke();
+            } else {
+                ctx.putImageData(snapshot, 0, 0);
+                ctx.beginPath();
+                if (tool === 'rect') {
+                    ctx.strokeRect(startX, startY, e.offsetX - startX, e.offsetY - startY);
+                } else if (tool === 'arrow') {
+                    const head = ctx.lineWidth * 2, angle = Math.atan2(e.offsetY - startY, e.offsetX - startX);
+                    ctx.moveTo(startX, startY); ctx.lineTo(e.offsetX, e.offsetY);
+                    ctx.lineTo(e.offsetX - head * Math.cos(angle - Math.PI/6), e.offsetY - head * Math.sin(angle - Math.PI/6));
+                    ctx.moveTo(e.offsetX, e.offsetY);
+                    ctx.lineTo(e.offsetX - head * Math.cos(angle + Math.PI/6), e.offsetY - head * Math.sin(angle + Math.PI/6));
+                    ctx.stroke();
+                }
+            }
+        };
+
+        canvas.onmouseup = () => {
+            if (isDrawing) {
+                saveState();
+                isDrawing = false;
+            }
+        };
+
+        // 4. Utility Functions
+        function saveState() {
+            if (undoStack.length >= 25) undoStack.shift();
+            undoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
         }
-    };
 
-    const moveDraw = (e) => {
-        const p = getPos(e);
-        document.getElementById('coords').innerText = `${Math.round(p.x)}, ${Math.round(p.y)}`;
-        if (!isDrawing) return;
-
-        if (currentMode === 'paint' || currentMode === 'erase') {
-            dctx.globalCompositeOperation = (currentMode === 'erase') ? 'destination-out' : 'source-over';
-            dctx.lineTo(p.x, p.y); dctx.stroke();
-        } else if (['rect', 'circle', 'line'].includes(currentMode)) {
-            dctx.putImageData(snapshot, 0, 0);
-            dctx.beginPath();
-            if (currentMode === 'rect') dctx.strokeRect(startX, startY, p.x - startX, p.y - startY);
-            else if (currentMode === 'circle') {
-                let r = Math.sqrt(Math.pow(p.x - startX, 2) + Math.pow(p.y - startY, 2));
-                dctx.arc(startX, startY, r, 0, 2 * Math.PI); dctx.stroke();
-            } else if (currentMode === 'line') {
-                dctx.moveTo(startX, startY); dctx.lineTo(p.x, p.y); dctx.stroke();
+        function undo() {
+            if (undoStack.length > 1) {
+                undoStack.pop();
+                ctx.putImageData(undoStack[undoStack.length - 1], 0, 0);
             }
         }
-    };
 
-    drawC.onmousedown = startDraw;
-    drawC.onmousemove = moveDraw;
-    window.onmouseup = () => { if (isDrawing) saveState(); isDrawing = false; };
+        function download() {
+            if (undoStack.length === 0) return;
+            const link = document.createElement('a');
+            link.download = 'annotated-image.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
 
-    drawC.addEventListener('touchstart', (e) => { if (e.target === drawC) e.preventDefault(); startDraw(e); }, { passive: false });
-    drawC.addEventListener('touchmove', (e) => { if (e.target === drawC) e.preventDefault(); moveDraw(e); }, { passive: false });
-    drawC.addEventListener('touchend', () => { if (isDrawing) saveState(); isDrawing = false; });
+        // Support Ctrl+Z
+        window.onkeydown = (e) => { if (e.ctrlKey && e.key === 'z') undo(); };
 
-    function clearMap() { if(confirm("Clear markings?")) { dctx.clearRect(0,0,drawC.width, drawC.height); saveState(); } }
-    function downloadMap() {
-        const finalCanvas = document.createElement('canvas');
-        finalCanvas.width = mapC.width; finalCanvas.height = mapC.height;
-        const fctx = finalCanvas.getContext('2d');
-        fctx.drawImage(mapC, 0, 0); fctx.drawImage(drawC, 0, 0);
-        const link = document.createElement('a');
-        link.download = `Tactical-Map.png`;
-        link.href = finalCanvas.toDataURL(); link.click();
-    }
-</script>
+           function setTool(t) {
+            tool = t;
+            document.querySelectorAll('#toolMenu a').forEach(b => b.classList.remove('active'));
+            if(document.getElementById(t + 'Btn')) document.getElementById(t + 'Btn').classList.add('active');
+            if(window.event) window.event.preventDefault();
+        }
+    </script>
 </body>
 </html>
