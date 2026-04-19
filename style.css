@@ -406,27 +406,6 @@ footer {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         /* Essential Utility Class - Matches JS .toggle('hidden') */
         .hidden {
             display: none !important;
@@ -571,42 +550,7 @@ footer {
 }
 
 
-/* --- Tactical Map Overrides --- */
-#map-container::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
 
-#map-container::-webkit-scrollbar-track {
-    background: var(--bg-main);
-}
-
-#map-container::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 10px;
-}
-
-#map-container::-webkit-scrollbar-thumb:hover {
-    background: var(--accent);
-}
-
-.btn-tool.active {
-    background: var(--accent-soft) !important;
-    color: var(--accent) !important;
-    font-weight: 600;
-}
-
-/* Ensure the canvas stack is centered if the map is smaller than the screen */
-#canvas-stack {
-    box-shadow: 0 0 50px rgba(0,0,0,0.5);
-    background-color: #000;
-}
-
-@media (max-width: 768px) {
-    #map-container {
-        height: 70vh;
-    }
-}
 
 /* --- Map & Calculator Styling --- */
 .data-card {
@@ -620,7 +564,6 @@ footer {
 .leaflet-container {
     background: var(--bg-input) !important;
 }
-
 
 
 @media (max-width: 768px) {
