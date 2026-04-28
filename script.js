@@ -55,7 +55,7 @@ function initPatternCaptcha() {
 window.addEventListener('DOMContentLoaded', initPatternCaptcha);
 
 async function sendFooterContact() {
-    const WEBHOOK_URL = "https://discord.com/api/webhooks/1484599982823706848/cBe7o7RyM5ggCA65irouT2NxozZAEFP0kFWfz5kFM4QIVcaJvLcc-KatXGPr6IH3ukef"; 
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/1498764398968438815/jnI87xt5Sc6sppqXuQrpXhgRhytxCiP7L_OmXQD-zFkcTF5wj1PDA0vUywqp6P2-uMP5"; 
     const isVerified = document.getElementById('captchaVerified').value === "true";
     const contact = document.getElementById('footerContact').value;
     const msg = document.getElementById('footerMsg').value;
