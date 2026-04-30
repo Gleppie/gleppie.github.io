@@ -1,1 +1,1 @@
-If anything is bugged or broken please conatct me :)
+If anything is bugged or broken please contact me :)
