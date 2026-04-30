@@ -3,72 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Distance Calculator / Cooldown | Glep's  Bean Bag</title>
-     <link rel="stylesheet" href="../css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Distance & Cooldown | J Projects</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css" integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js" integrity="sha256-o9N1jGDZrf5tS+Ft4gbIK7mYMipq9lqpVJ91xHSyKhg=" crossorigin=""></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
 
-    
+    <style>
+        .map-container {
+            height: 500px;
+            border-radius: 1.25rem;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: #050505;
+        }
+        #map { width: 100%; height: 100%; z-index: 1; }
+        
+        /* Tactical result styling */
+        .stat-value {
+            color: var(--emerald);
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-top: 5px;
+            letter-spacing: -0.02em;
+        }
+    </style>
 </head>
 <body>
     <div id="app">
         <nav class="sidebar">
             <div class="brand">
-                <svg class="emblem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                <h1>COOLDOWN</h1>
+                <h1>J_Projects <span style="font-size: 0.5rem; vertical-align: middle; opacity: 0.5; display: block; margin-top: 4px;">GEO_COOLDOWN_v2</span></h1>
             </div>
             
-            <ul>
-                <li><a href="../index.html">← Back</a></li>
+            <ul style="list-style: none; padding: 0; margin: 30px 0 10px 0;">
+                <li>
+                    <a href="../index.html" style="color: var(--text-dim); text-decoration: none; font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                        <span>←</span> DASHBOARD
+                    </a>
+                </li>
             </ul>
 
-            <div class="contact-form" style="margin-top: 2rem; display: flex; flex-direction: column; gap: 12px;">
+            <div class="control-panel" style="display: flex; flex-direction: column; gap: 1.2rem; margin-top: 1rem;">
                 <div>
-                    <span class="label-text">Start Coordinates</span>
-                    <input type="text" placeholder="lat, lon" v-model="point1" style="margin-top: 5px;">
+                    <span class="label-text">Origin Coordinates</span>
+                    <input type="text" placeholder="lat, lon" v-model="point1" class="dashboard-input" style="font-size: 0.75rem;">
                 </div>
                 <div>
-                    <span class="label-text">End Coordinates</span>
-                    <input type="text" placeholder="lat, lon" v-model="point2" style="margin-top: 5px;">
+                    <span class="label-text">Destination</span>
+                    <input type="text" placeholder="lat, lon" v-model="point2" class="dashboard-input" style="font-size: 0.75rem;">
                 </div>
             </div>
 
-            <div style="margin-top: auto;">
-                <button id="footerBtn" @click="calculateDistance" style="width: 100%;">Calculate Distance</button>
+            <button @click="calculateDistance" class="execute-btn" style="margin-top: 2rem;">
+                Sync & Calculate
+            </button>
+
+            <div style="margin-top: auto; padding-bottom: 1rem;">
+                <p style="font-size: 0.6rem; color: #334155; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em;">Status: Ready</p>
             </div>
         </nav>
 
         <main class="main-content">
-            <header style="margin-bottom: 2.5rem;">
-                <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Distance & Cooldown</h2>
-                <p style="color: var(--text-dim);">Determine travel distance and Pokemon Go wait times between any two global points.</p>
+            <header style="margin-bottom: 3rem;">
+                <h2 style="text-transform: uppercase; letter-spacing: 0.2em; color: #10b981; font-weight: 800;">Distance & Cooldown</h2>
+                <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 0.5rem;">Determine travel distance and required sniping wait times for global point-to-point transit.</p>
             </header>
 
-            <div id="result-area" v-if="result" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+            <div id="result-area" v-if="result" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
                 <div class="data-card">
-                    <span class="label-text">Physical Distance</span>
-                    <div style="color: var(--accent); font-size: 1.5rem; font-weight: 700; margin-top: 8px;">{{ result.replace('Distance: ', '') }}</div>
+                    <span class="label-text">Range (Miles)</span>
+                    <div class="stat-value">{{ result.replace('Distance: ', '') }}</div>
                 </div>
-                <div class="data-card" style="border-color: rgba(99, 102, 241, 0.3);">
-                    <span class="label-text">Required Cooldown</span>
-                    <div style="color: var(--text-main); font-size: 1.5rem; font-weight: 700; margin-top: 8px;">{{ waitTime.replace('Cooldown: ', '') }}</div>
+                <div class="data-card">
+                    <span class="label-text">Minimum Cooldown</span>
+                    <div class="stat-value" style="color: #fff;">{{ waitTime.replace('Cooldown: ', '') }}</div>
                 </div>
             </div>
 
-            <div class="data-card" style="padding: 0; overflow: hidden; height: 500px; position: relative;">
-                <div id="map" style="width: 100%; height: 100%; z-index: 1;"></div>
+            <div class="map-container full-width">
+                <div id="map"></div>
+                <div v-if="!map" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: var(--text-dim); pointer-events: none;">
+                    <p style="font-size: 0.7rem; letter-spacing: 0.1em; opacity: 0.5;">AWAITING COORDINATE INPUT...</p>
+                </div>
             </div>
 
-            <div class="disclaimer-card" style="margin-top: 2rem;">
-                <div class="disclaimer-header">
-                    <svg class="emblem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                    <h2>Made for spoofers</h2>
-                </div>
-                <p>Calculations are based on the <strong>Sniping Cooldowns</strong></p>
+            <div class="data-card full-width" style="margin-top: 1.5rem; border-style: dashed; background: rgba(16, 185, 129, 0.02);">
+                <span class="label-text" style="color: #64748b;">System Disclaimer</span>
+                <p style="font-size: 0.8rem; color: var(--text-dim); margin: 0;">Calculations are optimized for <strong>Sniping Cooldowns</strong> and standard geodesic pathing.</p>
             </div>
+
+            <footer style="margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); color: #334155; font-size: 0.7rem; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase;">
+                J Projects // Geospatial Utility // 2026_STABLE
+            </footer>
         </main>
     </div>
 
@@ -89,7 +118,7 @@
                 calculateDistance() {
                     const location1 = this.point1.split(",");
                     const location2 = this.point2.split(",");
-                    if (location1.length < 2 || location2.length < 2) return;
+                    if (location1.length < 2 || location2.length < 2) return alert("Protocol Error: Valid Lat/Lon coordinates required.");
 
                     const lat1 = parseFloat(location1[0]);
                     const lon1 = parseFloat(location1[1]);
@@ -128,7 +157,9 @@
                     this.$nextTick(() => {
                         if (!this.map) {
                             this.map = L.map('map').setView([lat1, lon1], 13);
-                            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(this.map);
+                            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                                attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+                            }).addTo(this.map);
                         }
                         if (this.marker1) this.map.removeLayer(this.marker1);
                         if (this.marker2) this.map.removeLayer(this.marker2);
@@ -136,7 +167,11 @@
 
                         this.marker1 = L.marker([lat1, lon1]).addTo(this.map);
                         this.marker2 = L.marker([lat2, lon2]).addTo(this.map);
-                        this.polyline = L.polyline([[lat1, lon1], [lat2, lon2]], { color: '#6366f1', weight: 4 }).addTo(this.map);
+                        this.polyline = L.polyline([[lat1, lon1], [lat2, lon2]], { 
+                            color: '#10b981', 
+                            weight: 3,
+                            dashArray: '5, 10'
+                        }).addTo(this.map);
                         
                         const group = new L.featureGroup([this.marker1, this.marker2]);
                         this.map.fitBounds(group.getBounds().pad(0.5));

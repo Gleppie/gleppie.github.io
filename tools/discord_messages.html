@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Custom Messages | J Projects</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="brand">
+            <h1>J_Projects <span style="font-size: 0.5rem; vertical-align: middle; opacity: 0.5; display: block; margin-top: 4px;">WEBHOOK_ENGINE_v2</span></h1>
+        </div>
+        
+        <ul style="list-style: none; padding: 0; margin: 30px 0 10px 0;">
+            <li>
+                <a href="../index.html" style="color: var(--text-dim); text-decoration: none; font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                    <span>←</span> DASHBOARD
+                </a>
+            </li>
+        </ul>
+
+        <button onclick="sendMessage()" class="execute-btn">
+            Execute Payload
+        </button>
+        
+        <div style="margin-top: auto; padding-bottom: 1rem;">
+            <p style="font-size: 0.6rem; color: #334155; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em;">
+                Status: Ready
+            </p>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header style="margin-bottom: 3rem;">
+            <h2 style="text-transform: uppercase; letter-spacing: 0.2em; color: #10b981; font-weight: 800;">Discord Custom Messages</h2>
+            <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 0.5rem;">Dispatch rich embeds or plain text notifications via secure webhook protocols.</p>
+        </header>
+
+        <div class="data-card full-width" style="margin-bottom: 1.5rem;">
+            <span class="label-text">Target Webhook URL</span>
+            <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." class="dashboard-input">
+        </div>
+
+        <div class="webhook-grid">
+            <div class="data-card full-width">
+                <span class="label-text">Payload Format</span>
+                <select id="msgType" onchange="toggleMode()">
+                    <option value="text">Plain Text (Standard)</option>
+                    <option value="embed">Rich Embed (Advanced)</option>
+                </select>
+            </div>
+
+            <div id="textSection" class="data-card full-width">
+                <span class="label-text">Message Content</span>
+                <textarea id="content" rows="6" placeholder="Input raw message string..."></textarea>
+            </div>
+
+            <div id="embedSection" class="hidden full-width" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="data-card">
+                    <span class="label-text">Embed Title</span>
+                    <input type="text" id="eTitle" placeholder="Heading" class="dashboard-input">
+                </div>
+                <div class="data-card">
+                    <span class="label-text">Visual Theme</span>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <input type="color" id="eColor" value="#10b981" style="height: 38px; width: 60px; background: none; border: 1px solid #333; cursor: pointer; border-radius: 4px;">
+                        <label style="font-size: 0.75rem; color: var(--text-dim); display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                            <input type="checkbox" id="randomColor"> Randomize
+                        </label>
+                    </div>
+                </div>
+                <div class="data-card full-width">
+                    <span class="label-text">Description / Body Text</span>
+                    <textarea id="eDesc" rows="4" placeholder="Main embed content..."></textarea>
+                </div>
+                <div class="data-card">
+                    <span class="label-text">Author Identity</span>
+                    <input type="text" id="eAuthor" placeholder="Display Name" class="dashboard-input">
+                </div>
+                <div class="data-card">
+                    <span class="label-text">Author Avatar URL</span>
+                    <input type="url" id="eAuthorIcon" placeholder="https://image.path" class="dashboard-input">
+                </div>
+                <div class="data-card">
+                    <span class="label-text">Thumbnail URL (Small)</span>
+                    <input type="url" id="eThumb" placeholder="https://image.path" class="dashboard-input">
+                </div>
+                <div class="data-card">
+                    <span class="label-text">Main Image URL (Large)</span>
+                    <input type="url" id="eImage" placeholder="https://image.path" class="dashboard-input">
+                </div>
+                <div class="data-card">
+                    <span class="label-text">Footer Text</span>
+                    <input type="text" id="eFooter" placeholder="System tag or timestamp..." class="dashboard-input">
+                </div>
+                <div class="data-card">
+                    <span class="label-text">Footer Icon URL</span>
+                    <input type="url" id="eFooterIcon" placeholder="https://image.path" class="dashboard-input">
+                </div>
+            </div>
+        </div>
+        
+        <footer style="margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); color: #334155; font-size: 0.7rem; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase;">
+            J Projects // Core Utility // 2026_STABLE
+        </footer>
+    </main>
+
+    <script>
+        function toggleMode() {
+            const isEmbed = document.getElementById('msgType').value === 'embed';
+            const embedSec = document.getElementById('embedSection');
+            const textSec = document.getElementById('textSection');
+            
+            if (isEmbed) {
+                embedSec.classList.remove('hidden');
+                textSec.classList.add('hidden');
+                embedSec.style.display = 'grid';
+            } else {
+                embedSec.classList.add('hidden');
+                textSec.classList.remove('hidden');
+                embedSec.style.display = 'none';
+            }
+        }
+
+        function clean(obj) {
+            for (const key in obj) {
+                if (obj[key] === null || obj[key] === undefined || obj[key] === "" || (typeof obj[key] === 'object' && Object.keys(obj[key]).length === 0)) {
+                    delete obj[key];
+                }
+            }
+            return Object.keys(obj).length === 0 ? null : obj;
+        }
+
+        async function sendMessage() {
+            const url = document.getElementById('webhookUrl').value.trim();
+            const type = document.getElementById('msgType').value;
+            const isRandom = document.getElementById('randomColor').checked;
+            
+            if (!url.startsWith('https://discord.com/api/webhooks/')) {
+                return alert("⚠️ Protocol Error: Invalid Discord Webhook URL.");
+            }
+
+            let payload = {};
+
+            if (type === 'text') {
+                payload.content = document.getElementById('content').value;
+                if (!payload.content.trim()) return alert("Payload Error: Content string required.");
+            } else {
+                let colorDecimal;
+                if (isRandom) {
+                    colorDecimal = Math.floor(Math.random() * 16777215);
+                } else {
+                    const hex = document.getElementById('eColor').value.replace('#', '');
+                    colorDecimal = parseInt(hex, 16) || 0;
+                }
+
+                const author = clean({
+                    name: document.getElementById('eAuthor').value,
+                    icon_url: document.getElementById('eAuthorIcon').value
+                });
+
+                const footer = clean({
+                    text: document.getElementById('eFooter').value,
+                    icon_url: document.getElementById('eFooterIcon').value
+                });
+
+                const thumbnail = clean({ url: document.getElementById('eThumb').value });
+                const image = clean({ url: document.getElementById('eImage').value });
+
+                const embed = {
+                    title: document.getElementById('eTitle').value || null,
+                    description: document.getElementById('eDesc').value || null,
+                    color: colorDecimal,
+                    author: author,
+                    footer: footer,
+                    thumbnail: thumbnail,
+                    image: image
+                };
+
+                const cleanedEmbed = clean(embed);
+                if (!cleanedEmbed || (!cleanedEmbed.title && !cleanedEmbed.description)) {
+                    return alert("Payload Error: Embeds require at least a Title or Description.");
+                }
+                payload.embeds = [cleanedEmbed];
+            }
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert("✅ DISPATCH SUCCESS: Payload accepted by Discord.");
+                } else {
+                    const errorData = await response.json();
+                    alert(`Discord Protocol Error: ${errorData.message}`);
+                }
+            } catch (err) {
+                alert("Connection Interrupted: " + err.message);
+            }
+        }
+    </script>
+</body>
+</html>

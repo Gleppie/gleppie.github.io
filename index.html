@@ -3,79 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glep's | Bean Bag</title>
+    <title>J | Projects</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="text-slate-200 min-h-screen p-4 md:p-8">
 
-    <nav class="sidebar">
-        <div class="brand">
-            <svg class="emblem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="16 18 22 12 16 6"></polyline>
-                <polyline points="8 6 2 12 8 18"></polyline>
-                <line x1="14" y1="4" x2="10" y2="20"></line>
-            </svg>
-            <h1>Glep's Bean Bag</h1>
-        </div>
-        <ul>
-            <li><a href="tools/quick-paste.html">Quick Paste</a></li>
-            <li><a href="tools/uep.html">EPU Generator</a></li>
-            <li><a href="tools/discord-messages.html">Discord Messages Creator</a></li>
-            <li><a href="tools/itcss.html">Image to CSS</a></li>
-            <li><a href="tools/lastwar.html">Last War Map Tools</a></li>
-            <li><a href="tools/pokego-distance-calc.html">Pokémon GO Distance Calculator</a></li>
-            <li><a href="tools/qrcode.html">QR Code Generator</a></li>
-        </ul>
-    </nav>
-
-    <div class="main-content">
-        <div class="disclaimer-card">
-            <div class="disclaimer-header">
-                <svg class="emblem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                    <line x1="12" y1="9" x2="12" y2="13"></line>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <h2>Testing & Experimental Disclaimer</h2>
+    <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
+            <div>
+                <h1 class="text-5xl font-extrabold tracking-[-0.05em] text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500 uppercase">
+                    J_Projects<span class="text-xs ml-3 px-2 py-1 bg-emerald-900/30 border border-emerald-500/50 rounded text-emerald-400 align-middle animate-pulse">v2.0_STABLE</span>
+                </h1>
+                <p class="text-slate-400 mt-2 uppercase tracking-[0.3em] text-[10px] font-bold">Experimental Utility Suite // Development Environment</p>
             </div>
-            <p>Everything on this page is created strictly for <strong>testing and experimental purposes</strong>. 
-               By proceeding, you acknowledge that I am <strong>not responsible</strong> for how you use these tools. 
-               Use at your own discretion. Select a tool from the sidebar to begin.</p>
         </div>
-    </div>
 
-    <footer>
-        <div class="footer-content">
-            <div class="footer-column">
-                <span>Find Me</span>
-                <div class="social-links">
-                    <a href="https://github.com/0ja" target="_blank">GitHub</a>
-                    <a href="#">Discord: @J7o</a>
-                </div>
-            </div>
-
-            <div class="footer-column">
-                <span>Contact Me</span>
-                <div class="contact-form">
-                    <input type="text" id="footerContact" placeholder="Discord User or Email">
-                    <textarea id="footerMsg" placeholder="Brief message..." rows="3"></textarea>
-                    
-                    <div class="pattern-captcha">
-                        <div id="captchaPrompt" class="label-text">
-                            Verify: Click the <strong id="targetIconName" style="color: var(--accent);">...</strong>
-                        </div>
-                        <div id="iconGrid" class="icon-grid"></div>
-                        <input type="hidden" id="captchaVerified" value="false">
+        <div class="glass-card p-8 rounded-3xl">
+            <h3 class="text-emerald-400 text-[10px] font-bold mb-8 tracking-widest flex items-center gap-2 uppercase">
+                <i class="fa-solid fa-microchip text-xs"></i> Functional_Projects
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <a href="tools/quick-paste.html" class="group bg-black/40 border border-emerald-500/20 rounded-2xl p-6 hover:border-emerald-400/50 transition-all">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[11px] font-bold text-emerald-400 tracking-wider">QUICK_PASTE</span>
+                        <i class="fa-solid fa-paste text-xs text-slate-600 group-hover:text-emerald-400"></i>
                     </div>
+                    <p class="text-[10px] text-slate-500 leading-relaxed">Temporary snippet management and local storage utility.</p>
+                </a>
 
-                    <button class="filter-btn active" onclick="sendFooterContact()" id="footerBtn" disabled>Verify to Send</button>
+                <a href="tools/uep.html" class="group bg-black/40 border border-cyan-500/20 rounded-2xl p-6 hover:border-cyan-400/50 transition-all">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[11px] font-bold text-cyan-400 tracking-wider">EPU_GENERATOR</span>
+                        <i class="fa-solid fa-key text-xs text-slate-600 group-hover:text-cyan-400"></i>
+                    </div>
+                    <p class="text-[10px] text-slate-500 leading-relaxed">Secure data generation for email, password, and usernames.</p>
+                </a>
+
+             <a href="tools/discord_messages.html" class="group bg-black/40 border border-indigo-500/20 rounded-2xl p-6 hover:border-indigo-400/50 transition-all">
+    <div class="flex justify-between items-center mb-3">
+        <span class="text-[11px] font-bold text-indigo-400 tracking-wider">DISCORD_GEN</span>
+        <i class="fa-brands fa-discord text-xs text-slate-600 group-hover:text-indigo-400"></i>
+    </div>
+    <p class="text-[10px] text-slate-500 leading-relaxed">Advanced formatting and visualization for Discord integrations.</p>
+</a>
+
+                <a href="tools/itcss.html" class="group bg-black/40 border border-pink-500/20 rounded-2xl p-6 hover:border-pink-400/50 transition-all">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[11px] font-bold text-pink-400 tracking-wider">IMAGE_CSS</span>
+                        <i class="fa-solid fa-file-code text-xs text-slate-600 group-hover:text-pink-400"></i>
+                    </div>
+                    <p class="text-[10px] text-slate-500 leading-relaxed">Optimization tool for rendering visual assets via CSS logic.</p>
+                </a>
+
+                <a href="tools/lastwar.html" class="group bg-black/40 border border-amber-500/20 rounded-2xl p-6 hover:border-amber-400/50 transition-all">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[11px] font-bold text-amber-400 tracking-wider">LAST_WAR_MAP</span>
+                        <i class="fa-solid fa-map-location-dot text-xs text-slate-600 group-hover:text-amber-400"></i>
+                    </div>
+                    <p class="text-[10px] text-slate-500 leading-relaxed">Tactical coordinate mapping for survival-strategy tracking.</p>
+                </a>
+
+                <a href="tools/qrcode.html" class="group bg-black/40 border border-white/20 rounded-2xl p-6 hover:border-white/50 transition-all">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[11px] font-bold text-white tracking-wider">QR_GEN</span>
+                        <i class="fa-solid fa-qrcode text-xs text-slate-600 group-hover:text-white"></i>
+                    </div>
+                    <p class="text-[10px] text-slate-500 leading-relaxed">Vector-based QR generation for rapid data sharing.</p>
+                </a>
+
+                <a href="tools/pokego-distance-calc.html" class="group bg-black/40 border border-emerald-500/20 rounded-2xl p-6 hover:border-emerald-400/50 transition-all">
+    <div class="flex justify-between items-center mb-3">
+        <span class="text-[11px] font-bold text-emerald-400 tracking-wider">GEO_COOLDOWN_SYNC</span>
+        <i class="fa-solid fa-location-crosshairs text-xs text-slate-600 group-hover:text-emerald-400"></i>
+    </div>
+    <p class="text-[10px] text-slate-500 leading-relaxed">Geospatial distance mapping and sniping cooldown calculation for global transit.</p>
+</a>
+
+            </div>
+        </div>
+
+        <div class="mt-12 border-t border-slate-800 pt-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex flex-col">
+                    <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.4em]">Find Me Here</p>
+                    <div class="flex flex-wrap gap-4 mt-3 items-center">
+                        <a href="https://github.com/0ja" target="_blank" class="flex items-center gap-2 group">
+                            <i class="fa-brands fa-github text-slate-600 group-hover:text-white transition-colors"></i>
+                            <span class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Git:</span>
+                            <span class="text-[9px] text-slate-300 font-bold group-hover:text-white transition-colors">0ja</span>
+                        </a>
+                        
+                        <div class="h-3 w-[1px] bg-slate-800"></div>
+                        
+                        <div class="flex items-center gap-2 group cursor-pointer">
+                            <i class="fa-brands fa-discord text-slate-600 group-hover:text-emerald-400 transition-colors"></i>
+                            <span class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Discord:</span>
+                            <span class="text-[9px] text-slate-300 font-bold group-hover:text-emerald-400 transition-colors">J7o</span>
+                        </div>
+                        
+                        <div class="h-3 w-[1px] bg-slate-800"></div>
+                        
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-code-branch text-slate-600"></i>
+                            <span class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">License:</span>
+                            <span class="text-[9px] text-slate-300 font-bold">SandBox</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <p class="copyright">© 2026 Glep's Bean Bag | For Testing Only</p>
-    </footer>
 
-    <script src="js/script.js"></script>
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-slate-800/50 pt-8 pb-16">
+            <div class="space-y-3">
+                <h4 class="text-[10px] font-bold text-red-500/80 tracking-[0.2em] uppercase">// 01_NOTICE</h4>
+                <p class="text-[9px] text-slate-600 leading-relaxed italic">
+                    This suite is for testing purposes only. No warranty is provided for experimental modules.
+                </p>
+            </div>
+            <div class="space-y-3">
+                <h4 class="text-[10px] font-bold text-emerald-500/80 tracking-[0.2em] uppercase">// 02_PROTOCOLS</h4>
+                <ul class="text-[9px] text-slate-600 space-y-2">
+                    <li class="flex gap-2"><span class="text-slate-500">></span> Maintain appropriate request jitter.</li>
+                    <li class="flex gap-2"><span class="text-slate-500">></span> Sanitize local environment variables.</li>
+                </ul>
+            </div>
+            <div class="space-y-3">
+                <h4 class="text-[10px] font-bold text-amber-500/80 tracking-[0.2em] uppercase">// 03_PRIVACY</h4>
+                <p class="text-[9px] text-slate-600 leading-relaxed">
+                    Module execution remains client-side. Data persistence is limited to local browser storage.
+                </p>
+            </div>
+        </div>
+    </div> 
 </body>
 </html>
